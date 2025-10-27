@@ -60,7 +60,6 @@ const InterviewSession: React.FC<InterviewSessionProps> = ({ questions, onFinish
   const [currentAnswer, setCurrentAnswer] = useState('');
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [isRecording, setIsRecording] = useState(false);
-  const [hasRecorded, setHasRecorded] = useState(false);
   const [isSpeechSupported, setIsSpeechSupported] = useState(true);
 
   const recognitionRef = useRef<SpeechRecognition | null>(null);
@@ -158,12 +157,9 @@ const InterviewSession: React.FC<InterviewSessionProps> = ({ questions, onFinish
       setCurrentAnswer(''); // Clear previous answer on new recording start
       transcriptRef.current = '';
       finalTranscriptRef.current = ''; // Reset final transcript
-      setHasRecorded(false);
       recognitionRef.current.start();
     } else {
       recognitionRef.current.stop();
-      // For verbal-only questions, we enable the next button as soon as recording stops.
-      setHasRecorded(true);
     }
   };
 
@@ -184,7 +180,6 @@ const InterviewSession: React.FC<InterviewSessionProps> = ({ questions, onFinish
     setCurrentAnswer('');
     transcriptRef.current = '';
     finalTranscriptRef.current = ''; // Reset final transcript for new question
-    setHasRecorded(false);
     stopCurrentRecording();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentQuestionIndex]);
@@ -252,7 +247,7 @@ const InterviewSession: React.FC<InterviewSessionProps> = ({ questions, onFinish
                 </button>
                 <button
                     onClick={handleNext}
-                    disabled={isVerbalOnly ? !hasRecorded : !currentAnswer.trim()}
+                    disabled={!currentAnswer.trim()}
                     className="px-8 py-3 bg-violet-600 text-white font-bold rounded-lg hover:bg-violet-700 disabled:bg-gray-600 disabled:cursor-not-allowed focus:outline-none focus:ring-4 focus:ring-violet-500/50 transition-all duration-300"
                 >
                     {isLastQuestion ? 'Finish & See Results' : 'Submit & Next'}
