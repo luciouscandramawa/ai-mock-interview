@@ -96,8 +96,11 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ report, onRetry }) => {
                         <span className="flex items-center text-xs text-red-400 bg-red-900/50 px-2 py-0.5 rounded-full"><XCircleIcon className="w-3 h-3 mr-1"/> Incorrect</span>
                     }
                 </div>
-                <p className="text-gray-200 italic mb-3">"{item.answer}"</p>
-                <p className="text-gray-300">{item.evaluation}</p>
+                <p className="text-gray-200 italic mb-4">"{item.answer}"</p>
+                <div className="bg-[#2C2D3A]/70 p-4 rounded-lg">
+                    <h4 className="font-semibold text-violet-300 mb-2">AI Feedback (Score: {item.score}/10)</h4>
+                    <p className="text-sm text-gray-300">{item.evaluation}</p>
+                </div>
               </div>
             </div>
           ))}
