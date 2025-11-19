@@ -3,14 +3,12 @@ import React, { useState, useEffect } from 'react';
 import { getTeacherDashboardData } from '../services/geminiService';
 import type { StudentSummary } from '../types';
 import Spinner from './Spinner';
-import { ArrowLeftIcon } from './icons';
 
 interface TeacherDashboardProps {
   onSelectStudent: (studentId: string) => void;
-  onBackToWelcome: () => void;
 }
 
-const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onSelectStudent, onBackToWelcome }) => {
+const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onSelectStudent }) => {
   const [students, setStudents] = useState<StudentSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -33,47 +31,40 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onSelectStudent, on
   }
 
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto animate-fadeIn">
        <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-bold text-white">Teacher Dashboard</h1>
-            <button 
-                onClick={onBackToWelcome} 
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700/50 rounded-md hover:bg-gray-600/50 transition-colors"
-            >
-                <ArrowLeftIcon className="w-4 h-4"/>
-                Student Portal
-            </button>
+            <h1 className="text-3xl font-semibold text-slate-800">Teacher Dashboard</h1>
         </div>
-      <div className="bg-[#1E1F2A] border border-gray-700/50 rounded-lg shadow-lg overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-lg shadow-md overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full text-sm text-left text-gray-300">
-            <thead className="text-xs text-gray-400 uppercase bg-[#2C2D3A]">
+          <table className="min-w-full text-sm text-left text-slate-600">
+            <thead className="text-xs text-slate-500 uppercase bg-slate-50">
               <tr>
-                <th scope="col" className="px-6 py-3">Student Name</th>
-                <th scope="col" className="px-6 py-3">Major</th>
-                <th scope="col" className="px-6 py-3">Status</th>
-                <th scope="col" className="px-6 py-3 text-center">Latest Score</th>
-                <th scope="col" className="px-6 py-3 text-center">Improvement</th>
+                <th scope="col" className="px-6 py-4 font-semibold">Student Name</th>
+                <th scope="col" className="px-6 py-4 font-semibold">Major</th>
+                <th scope="col" className="px-6 py-4 font-semibold">Status</th>
+                <th scope="col" className="px-6 py-4 font-semibold text-center">Latest Score</th>
+                <th scope="col" className="px-6 py-4 font-semibold text-center">Improvement</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-slate-200">
               {students.map((student) => (
                 <tr
                   key={student.id}
-                  className="bg-[#1E1F2A] border-b border-gray-700/50 hover:bg-[#2C2D3A] cursor-pointer transition-colors"
+                  className="hover:bg-slate-50 cursor-pointer transition-colors"
                   onClick={() => onSelectStudent(student.id)}
                 >
-                  <td className="px-6 py-4 font-medium text-white whitespace-nowrap">{student.name}</td>
+                  <td className="px-6 py-4 font-medium text-slate-800 whitespace-nowrap">{student.name}</td>
                   <td className="px-6 py-4">{student.major}</td>
                   <td className="px-6 py-4">
                     {student.completed ? (
-                      <span className="px-2 py-1 text-xs font-medium text-green-300 bg-green-900/50 rounded-full">Completed</span>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-green-800 bg-green-100">Completed</span>
                     ) : (
-                      <span className="px-2 py-1 text-xs font-medium text-yellow-300 bg-yellow-900/50 rounded-full">Pending</span>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-primary-text bg-primary-lightest">Pending</span>
                     )}
                   </td>
-                  <td className="px-6 py-4 text-center font-mono">{student.latestScore}/100</td>
-                  <td className={`px-6 py-4 text-center font-mono ${student.improvement >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  <td className="px-6 py-4 text-center font-mono text-slate-800">{student.latestScore}/100</td>
+                  <td className={`px-6 py-4 text-center font-mono font-medium ${student.improvement >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                     {student.improvement >= 0 ? `+${student.improvement}%` : `${student.improvement}%`}
                   </td>
                 </tr>

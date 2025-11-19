@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -7,20 +6,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AI Interview Coach</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                DEFAULT: '#6700e6',
+                dark: '#4a00a3',
+                focus: '#8137ff',
+                text: '#5b00cc',
+                medium: '#9c68ff',
+                light: '#d6c0ff',
+                lighter: '#e9dfff',
+                lightest: '#f4efff',
+              },
+            },
+            animation: {
+              fadeIn: 'fadeIn 0.4s ease-out',
+              slideInFromRight: 'slideInFromRight 0.4s ease-out',
+              slideInFromLeft: 'slideInFromLeft 0.4s ease-out',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: 0 },
+                '100%': { opacity: 1 },
+              },
+              slideInFromRight: {
+                '0%': { transform: 'translateX(100%)', opacity: 0 },
+                '100%': { transform: 'translateX(0)', opacity: 1 },
+              },
+              slideInFromLeft: {
+                '0%': { transform: 'translateX(-100%)', opacity: 0 },
+                '100%': { transform: 'translateX(0)', opacity: 1 },
+              },
+            }
+          },
+        },
+      }
+    </script>
     <style>
       /* Custom scrollbar for a more integrated look */
       ::-webkit-scrollbar {
         width: 8px;
       }
       ::-webkit-scrollbar-track {
-        background: #1e1f2a;
+        background: #f1f5f9; /* slate-100 */
       }
       ::-webkit-scrollbar-thumb {
-        background: #4a4e69;
+        background: #cbd5e1; /* slate-300 */
         border-radius: 4px;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: #6a6e9a;
+        background: #94a3b8; /* slate-400 */
       }
     </style>
   <script type="importmap">
@@ -34,7 +72,7 @@
 }
 </script>
 </head>
-  <body class="bg-[#10111A]">
+  <body class="bg-slate-50">
     <div id="root"></div>
   </body>
 </html>

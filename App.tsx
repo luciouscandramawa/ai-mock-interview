@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import WelcomeScreen from './components/WelcomeScreen';
 import InterviewSession from './components/InterviewSession';
@@ -9,13 +10,37 @@ import { generateQuestions, evaluateAnswers, saveInterviewReportForStudent } fro
 
 type View = 'welcome' | 'session' | 'results' | 'teacherDashboard' | 'studentDetail';
 
+const AdminHeader: React.FC = () => (
+  <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm my-6 flex items-center justify-between animate-fadeIn">
+    <div className="flex items-center gap-4">
+      <span className="text-3xl" role="img" aria-label="Teacher">👩‍🏫</span>
+      <div>
+        <h2 className="font-bold text-slate-800">What an Admin can do</h2>
+        <p className="text-sm text-slate-600">Create a curriculum for your organization and invite users!</p>
+      </div>
+    </div>
+  </div>
+);
+
 const App: React.FC = () => {
   const [view, setView] = useState<View>('welcome');
+  const [isAdminMode, setIsAdminMode] = useState(false);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [report, setReport] = useState<InterviewReport | null>(null);
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const handleModeToggle = (isAdmin: boolean) => {
+    setIsAdminMode(isAdmin);
+    if (isAdmin) {
+      setView('teacherDashboard');
+    } else {
+      setView('welcome');
+      setQuestions([]);
+      setReport(null);
+    }
+  };
 
   const handleStartInterview = useCallback(async (input: string | { data: string; mimeType: string }) => {
     setIsLoading(true);
@@ -37,8 +62,6 @@ const App: React.FC = () => {
     setError(null);
     try {
       const interviewReport = await evaluateAnswers(questions, answers);
-      // In a real app, you'd have a logged-in user. Here we simulate
-      // updating student '3' (Seo-jun Lee) who is marked as 'Pending'.
       saveInterviewReportForStudent('3', interviewReport);
       setReport(interviewReport);
       setView('results');
@@ -56,10 +79,6 @@ const App: React.FC = () => {
     setReport(null);
     setView('welcome');
   };
-  
-  const handleBackToWelcome = () => {
-    setView('welcome');
-  };
 
   const handleViewStudent = (studentId: string) => {
     setSelectedStudentId(studentId);
@@ -74,8 +93,8 @@ const App: React.FC = () => {
   const renderView = () => {
     if (isLoading) {
       return (
-        <div className="flex flex-col items-center justify-center h-screen text-white">
-          <div className="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-violet-400"></div>
+        <div className="flex flex-col items-center justify-center h-screen text-slate-700">
+          <div className="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-primary"></div>
           <p className="mt-4 text-lg">AI is working its magic...</p>
         </div>
       );
@@ -83,16 +102,16 @@ const App: React.FC = () => {
 
     if (error) {
        return (
-        <div className="flex flex-col items-center justify-center h-screen text-white">
-            <div className="bg-red-900/50 border border-red-500 p-6 rounded-lg text-center">
-                <h2 className="text-xl font-bold mb-2 text-red-300">An Error Occurred</h2>
-                <p className="text-red-200">{error}</p>
+        <div className="flex flex-col items-center justify-center h-screen text-slate-700">
+            <div className="bg-red-100 border border-red-400 p-6 rounded-lg text-center shadow-lg">
+                <h2 className="text-xl font-bold mb-2 text-red-800">An Error Occurred</h2>
+                <p className="text-red-700">{error}</p>
                 <button 
                     onClick={() => {
                       setError(null);
-                      setView('welcome');
+                      handleModeToggle(false);
                     }} 
-                    className="mt-4 px-4 py-2 bg-violet-600 hover:bg-violet-700 rounded-md transition-colors"
+                    className="mt-4 px-4 py-2 bg-primary text-white hover:bg-primary-dark rounded-md transition-colors"
                 >
                     Back to Start
                 </button>
@@ -108,30 +127,43 @@ const App: React.FC = () => {
       case 'results':
         return report && <ResultsScreen report={report} onRetry={handleTryAnotherTopic} />;
       case 'teacherDashboard':
-        return <TeacherDashboard onSelectStudent={handleViewStudent} onBackToWelcome={handleBackToWelcome} />;
+        return <TeacherDashboard onSelectStudent={handleViewStudent} />;
       case 'studentDetail':
-        return selectedStudentId && <StudentDetailView studentId={selectedStudentId} onBack={handleBackToDashboard} onBackToWelcome={handleBackToWelcome} />;
+        return selectedStudentId && <StudentDetailView studentId={selectedStudentId} onBack={handleBackToDashboard} />;
       case 'welcome':
       default:
-        return (
-            <div>
-                 <nav className="absolute top-0 left-0 right-0 p-4 flex justify-end">
-                    <button
-                        onClick={() => setView('teacherDashboard')}
-                        className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700/50 rounded-md hover:bg-gray-600/50 transition-colors"
-                    >
-                        Teacher View
-                    </button>
-                </nav>
-                <WelcomeScreen onStart={handleStartInterview} />
-            </div>
-        );
+        return <WelcomeScreen onStart={handleStartInterview} />;
     }
   };
 
   return (
-    <main className="min-h-screen bg-[#10111A] text-gray-200 font-sans p-4 sm:p-6 md:p-8">
-      <div className="max-w-5xl mx-auto">
+    <main className="min-h-screen bg-slate-50 text-slate-700 font-sans">
+      <div className="flex justify-center pt-6">
+        <div className="bg-slate-100 p-1 rounded-lg shadow-inner flex items-center border border-slate-200">
+          <button
+            onClick={() => handleModeToggle(false)}
+            className={`px-5 py-2 text-sm font-semibold rounded-md transition-all duration-300 ${
+              !isAdminMode
+                ? 'bg-white text-primary-text shadow-sm'
+                : 'text-slate-500 hover:bg-slate-200'
+            }`}
+          >
+            User view
+          </button>
+          <button
+            onClick={() => handleModeToggle(true)}
+            className={`px-5 py-2 text-sm font-semibold rounded-md transition-all duration-300 ${
+              isAdminMode
+                ? 'bg-white text-primary-text shadow-sm'
+                : 'text-slate-500 hover:bg-slate-200'
+            }`}
+          >
+            Admin mode
+          </button>
+        </div>
+      </div>
+      <div className="max-w-5xl mx-auto p-4 sm:p-6 lg:px-8">
+        {isAdminMode && <AdminHeader />}
         {renderView()}
       </div>
     </main>
