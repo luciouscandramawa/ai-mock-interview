@@ -47,18 +47,19 @@ export interface StudentSummary {
   completed: boolean;
 }
 
-export interface StudentSession {
-    question: string;
-    answer: string;
-    evaluation: string;
-    score: number;
-    isCorrect: boolean;
-}
-
+// StudentDetail now holds the full report instead of a partial session list
 export interface StudentDetail {
     id: string;
     name: string;
     major: string;
-    progressSummary: string;
-    sessions: StudentSession[];
+    report?: InterviewReport;
 }
+
+export interface User {
+    name: string;
+    email: string;
+    role: 'student' | 'teacher';
+    avatarUrl?: string;
+}
+
+export type AuthView = 'signin' | 'signup';

@@ -49,7 +49,8 @@ declare global {
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { Question, Answer } from '../types';
 import Card from './Card';
-import { MicIcon, StopCircleIcon } from './icons';
+import Button from './ui/Button';
+import { MicIcon, StopCircleIcon, LightbulbIcon, ClockIcon } from './icons';
 
 interface InterviewSessionProps {
   questions: Question[];
@@ -204,7 +205,7 @@ const InterviewSession: React.FC<InterviewSessionProps> = ({ questions, onFinish
               </span>
             </div>
             <div className="flex items-center gap-2 font-sans text-primary font-bold text-2xl">
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <ClockIcon className="w-6 h-6" />
               <span>{timeLeft}초</span>
             </div>
           </div>
@@ -223,8 +224,9 @@ const InterviewSession: React.FC<InterviewSessionProps> = ({ questions, onFinish
         <Card>
             <div className="flex justify-between items-center mb-4">
                 <p className="text-slate-600 font-medium">A. 답변</p>
-                <div className="text-xs bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full flex items-center">
-                    <span className="mr-1">💡</span> 팁: "매출이 20% 올랐습니다"처럼 구체적인 수치를 사용하여 답변해보세요.
+                <div className="text-xs bg-yellow-100 text-yellow-800 px-3 py-1.5 rounded-full flex items-center">
+                    <LightbulbIcon className="w-4 h-4 mr-1.5" />
+                    <span>팁: "매출이 20% 올랐습니다"처럼 구체적인 수치를 사용하여 답변해보세요.</span>
                 </div>
             </div>
             <textarea
@@ -244,13 +246,13 @@ const InterviewSession: React.FC<InterviewSessionProps> = ({ questions, onFinish
                     {isRecording ? <StopCircleIcon className="w-6 h-6 text-red-500" /> : <MicIcon className="w-6 h-6 text-slate-500" />}
                     {isRecording && <span className="absolute top-0 left-0 w-full h-full bg-red-500 rounded-full animate-ping opacity-50"></span>}
                 </button>
-                <button
+                <Button
                     onClick={handleNext}
                     disabled={!currentAnswer.trim()}
-                    className="px-8 py-3 bg-primary text-white font-bold rounded-lg hover:bg-primary-dark disabled:bg-slate-400 disabled:cursor-not-allowed focus:outline-none focus:ring-4 focus:ring-primary-focus/50 transition-all duration-300"
+                    className="px-8"
                 >
                     {isLastQuestion ? '면접 종료 및 결과 확인' : '다음 질문'}
-                </button>
+                </Button>
             </div>
         </Card>
       </div>

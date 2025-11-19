@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
 import type { Question, Answer, InterviewReport, StudentSummary, StudentDetail } from '../types';
 
@@ -200,73 +201,65 @@ let mockStudentList: StudentSummary[] = [
     { id: '4', name: '최혜원', major: '조리 과학', latestScore: 92, improvement: 20, completed: true },
 ];
 
+// Helper to generate a mock report
+const createMockReport = (score: number, name: string): InterviewReport => ({
+    scores: {
+        contentRelevance: score > 80 ? 9 : 7,
+        structure: score > 80 ? 8 : 6,
+        fluency: score > 80 ? 9 : 7,
+        confidence: score > 80 ? 8 : 6
+    },
+    totalScore: score / 10,
+    summary: {
+        strengths: `${name} 학생은 직무에 대한 이해도가 높고 경험을 구체적으로 설명할 수 있습니다. 특히 프로젝트 성과를 수치로 제시한 점이 인상적입니다.`,
+        areasForGrowth: "답변의 구조가 다소 느슨할 때가 있습니다. STAR 기법을 더 엄격하게 적용하여 서론-본론-결론을 명확히 하면 좋겠습니다."
+    },
+    detailedFeedback: [
+        {
+            question: "본인의 강점은 무엇인가요?",
+            answer: "저는 꼼꼼함이 강점입니다. 실수를 잘 안 합니다.",
+            evaluation: "강점을 언급했지만 구체적인 사례가 부족합니다. 어떤 프로젝트에서 꼼꼼함으로 문제를 예방했는지 설명해보세요.",
+            isCorrect: true,
+            score: 7
+        },
+        {
+            question: "어려움을 극복한 경험을 말해주세요.",
+            answer: "프로젝트 마감기한이 짧아서 힘들었지만, 밤새서 열심히 해서 끝냈습니다.",
+            evaluation: "열정은 좋지만, 단순히 '열심히'보다는 시간 관리를 어떻게 했는지, 팀원과 어떻게 협력했는지 구체적인 방법론(Action)이 필요합니다.",
+            isCorrect: true,
+            score: 6
+        }
+    ],
+    nextSteps: [
+        { title: "STAR 기법 훈련", description: "상황-과제-행동-결과 구조로 답변 작성하기 연습" },
+        { title: "모의 면접 반복", description: "다양한 질문에 대해 즉흥적으로 답변하는 연습 필요" }
+    ]
+});
+
 let mockStudentDetailData: { [key: string]: StudentDetail } = {
     '1': {
         id: '1',
         name: '김민호',
         major: '자동차 공학',
-        progressSummary: "지난주보다 유창성이 15% 향상되었습니다. 기술적인 설명이 좋아졌으나, 답변 마무리를 더 명확하게 할 필요가 있습니다.",
-        sessions: [
-            { 
-                question: "자동차 공학을 전공하게 된 계기는 무엇인가요?", 
-                answer: "어릴 때부터 자동차가 어떻게 굴러가는지 궁금했습니다. 삼촌이 정비사셔서 많이 배웠습니다.",
-                evaluation: "솔직하고 명확한 답변입니다. 다만 구체적인 에피소드를 곁들여 본인의 열정을 수치화하거나 구체화하면 더 좋겠습니다.",
-                score: 8.2,
-                isCorrect: true
-            },
-            {
-                question: "인턴십 중 문제를 해결한 경험이 있나요?", 
-                answer: "현대 정비소에서 일할 때 하이브리드 시스템 배선 문제가 있었습니다. 진단기를 써서 선배님과 같이 해결했습니다.",
-                evaluation: "STAR 기법을 더 활용해보세요. 본인이 구체적으로 어떤 '행동'을 했는지 강조가 필요합니다.",
-                score: 7.8,
-                isCorrect: true
-            },
-        ]
+        report: createMockReport(78, '김민호')
     },
     '2': {
         id: '2',
         name: '박지윤',
         major: '호텔 경영',
-        progressSummary: "고객 서비스 톤앤매너가 훌륭합니다. 다만 답변이 다소 짧은 경향이 있어 구조적인 스토리텔링 연습이 필요합니다.",
-        sessions: [
-            { 
-                question: "불만 고객을 어떻게 응대하시겠습니까?", 
-                answer: "우선 죄송하다고 사과드리고, 이야기를 끝까지 들어드린 뒤 할인 쿠폰 등을 제공하겠습니다.",
-                evaluation: "기본적인 응대 원칙을 잘 알고 계십니다. 실제 경험이나 구체적인 상황(예: 객실 업그레이드 등)을 예시로 들면 신뢰도가 높아집니다.",
-                score: 8.8,
-                isCorrect: true,
-            },
-        ]
+        report: createMockReport(85, '박지윤')
     },
     '3': {
         id: '3',
         name: '이서준',
         major: '컴퓨터 디자인',
-        progressSummary: "디자인 의도를 말로 설명하는 데 어려움을 겪고 있습니다. STAR 기법을 활용한 말하기 연습이 시급합니다.",
-        sessions: [
-            { 
-                question: "최근 프로젝트의 디자인 프로세스를 설명해주세요.", 
-                answer: "그냥 피그마 켜서 예쁘게 만들었습니다. 색깔은 인터넷에서 찾았습니다.",
-                evaluation: "너무 단답형이며 전문성이 드러나지 않습니다. 리서치 -> 와이어프레임 -> 프로토타입 -> 피드백 반영 과정을 논리적으로 설명해야 합니다.",
-                score: 5.5,
-                isCorrect: false,
-            },
-        ]
+        // Initially empty report for the demo user
     },
     '4': {
         id: '4',
         name: '최혜원',
         major: '조리 과학',
-        progressSummary: "매우 우수합니다. 조리 기술에 대한 열정이 돋보이며 답변의 구조도 탄탄합니다.",
-        sessions: [
-            { 
-                question: "가장 자신 있는 요리는 무엇인가요?", 
-                answer: "저는 묵은지 김치찌개에 자신 있습니다. 훈연 멸치 육수를 사용하여 감칠맛을 20% 이상 끌어올린 저만의 레시피가 있습니다.",
-                evaluation: "수치(20% 이상)를 활용하여 성과를 구체화한 점이 매우 훌륭합니다. 자신감이 느껴지는 답변입니다.",
-                score: 9.5,
-                isCorrect: true,
-            },
-        ]
+        report: createMockReport(92, '최혜원')
     }
 };
 
@@ -283,14 +276,7 @@ export const saveInterviewReportForStudent = (studentId: string, report: Intervi
         studentSummary.improvement = isFinite(improvement) ? improvement : 0;
         studentSummary.completed = true;
 
-        studentDetail.sessions = report.detailedFeedback.map(fb => ({
-            question: fb.question,
-            answer: fb.answer,
-            evaluation: fb.evaluation,
-            score: fb.score,
-            isCorrect: fb.isCorrect,
-        }));
-        studentDetail.progressSummary = `${report.summary.strengths} 하지만, ${report.summary.areasForGrowth}`;
+        studentDetail.report = report;
     }
 };
 

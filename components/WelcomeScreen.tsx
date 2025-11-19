@@ -1,6 +1,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { UploadCloudIcon, FileTextIcon } from './icons';
+import Button from './ui/Button';
 
 interface WelcomeScreenProps {
   onStart: (input: string | { data: string; mimeType: string }) => void;
@@ -99,13 +100,14 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
         </label>
         <input id="file-upload" name="file-upload" type="file" className="sr-only" onChange={handleFileChange} accept=".txt,.md,.pdf" />
         
-        <button
+        <Button
           onClick={handleStartClick}
           disabled={isStartDisabled}
-          className="w-full mt-8 bg-primary text-white font-bold py-4 px-6 rounded-xl hover:bg-primary-dark focus:outline-none focus:ring-4 focus:ring-primary-focus/50 transition-all duration-300 text-lg shadow-lg shadow-primary-focus/20 disabled:bg-slate-300 disabled:cursor-not-allowed disabled:shadow-none"
+          fullWidth
+          className="mt-8 py-4 text-lg"
         >
           면접 시작하기
-        </button>
+        </Button>
       </div>
     </div>
   );
