@@ -14,7 +14,11 @@ import { GraduationCapIcon } from './components/icons';
 
 type AppView = 'welcome' | 'session' | 'results' | 'teacherDashboard' | 'studentDetail';
 
-const AdminHeader: React.FC = () => (
+interface AdminHeaderProps {
+    user?: User | null;
+}
+
+const AdminHeader: React.FC<AdminHeaderProps> = ({ user }) => (
   <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm mb-6 flex items-center justify-between animate-fadeIn">
     <div className="flex items-center gap-4">
       <div className="p-2 bg-primary-lightest rounded-full">
@@ -22,7 +26,9 @@ const AdminHeader: React.FC = () => (
       </div>
       <div>
         <h2 className="font-bold text-slate-800">교사가 할 수 있는 일</h2>
-        <p className="text-sm text-slate-600">학생들의 역량 평가 진행 상황을 조회하세요.</p>
+        <p className="text-sm text-slate-600">
+            {user?.grade ? `${user.grade}학년 ` : ''}학생들의 역량 평가 진행 상황을 조회하세요.
+        </p>
       </div>
     </div>
   </div>
@@ -42,12 +48,11 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSignIn = (name: string, role: 'student' | 'teacher') => {
-    const user: User = { name, email: `${name.toLowerCase()}@elice.io`, role };
+  const handleAuthSuccess = (user: User) => {
     setCurrentUser(user);
     setIsAuthenticated(true);
-    // Route based on role
-    if (role === 'teacher') {
+    
+    if (user.role === 'teacher') {
         setView('teacherDashboard');
     } else {
         setView('welcome');
@@ -58,7 +63,6 @@ const App: React.FC = () => {
     setIsAuthenticated(false);
     setCurrentUser(null);
     setAuthView('signin');
-    // Reset app state
     setView('welcome');
     setQuestions([]);
     setReport(null);
@@ -66,6 +70,8 @@ const App: React.FC = () => {
 
   const handleRoleToggle = () => {
     if (!currentUser) return;
+    // Demo feature: toggle role but keep user data for simplicity in this mock
+    // In real app, this wouldn't exist or would require re-login
     const newRole = currentUser.role === 'student' ? 'teacher' : 'student';
     setCurrentUser({ ...currentUser, role: newRole });
     
@@ -96,6 +102,7 @@ const App: React.FC = () => {
     setError(null);
     try {
       const interviewReport = await evaluateAnswers(questions, answers);
+      // For demo: save to the 'demo student' slot or the current user if we had a real backend
       saveInterviewReportForStudent('3', interviewReport);
       setReport(interviewReport);
       setView('results');
@@ -160,7 +167,7 @@ const App: React.FC = () => {
       case 'results':
         return report && <ResultsScreen report={report} onRetry={handleTryAnotherTopic} />;
       case 'teacherDashboard':
-        return <TeacherDashboard onSelectStudent={handleViewStudent} />;
+        return currentUser && <TeacherDashboard currentUser={currentUser} onSelectStudent={handleViewStudent} />;
       case 'studentDetail':
         return selectedStudentId && <StudentDetailView studentId={selectedStudentId} onBack={handleBackToDashboard} />;
       case 'welcome':
@@ -172,9 +179,9 @@ const App: React.FC = () => {
   // Authentication Flow
   if (!isAuthenticated) {
     if (authView === 'signin') {
-        return <SignInScreen onSignIn={handleSignIn} onSwitchToSignUp={() => setAuthView('signup')} />;
+        return <SignInScreen onSignIn={handleAuthSuccess} onSwitchToSignUp={() => setAuthView('signup')} />;
     } else {
-        return <SignUpScreen onSignUp={handleSignIn} onSwitchToSignIn={() => setAuthView('signin')} />;
+        return <SignUpScreen onSignUp={handleAuthSuccess} onSwitchToSignIn={() => setAuthView('signin')} />;
     }
   }
 
@@ -187,7 +194,7 @@ const App: React.FC = () => {
         onToggleRole={handleRoleToggle} 
       />
       <main className="max-w-5xl mx-auto p-4 sm:p-6 lg:px-8 pt-8">
-        {currentUser?.role === 'teacher' && view === 'teacherDashboard' && <AdminHeader />}
+        {currentUser?.role === 'teacher' && view === 'teacherDashboard' && <AdminHeader user={currentUser} />}
         {renderMainContent()}
       </main>
     </div>

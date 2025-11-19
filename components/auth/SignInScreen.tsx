@@ -4,9 +4,11 @@ import AuthLayout from './AuthLayout';
 import Input from '../ui/Input';
 import Button from '../ui/Button';
 import { MailIcon, LockIcon } from '../icons';
+import { signIn } from '../../services/authService';
+import { User } from '../../types';
 
 interface SignInScreenProps {
-  onSignIn: (name: string, role: 'student' | 'teacher') => void;
+  onSignIn: (user: User) => void;
   onSwitchToSignUp: () => void;
 }
 
@@ -15,25 +17,20 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ onSignIn, onSwitchToSignUp 
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Mock authentication delay
-    setTimeout(() => {
-      setIsLoading(false);
-      // Simple mock logic based on email
-      const role = email.includes('teacher') ? 'teacher' : 'student';
-      let name = email.split('@')[0];
-      
-      if (role === 'teacher') {
-          name = '교사';
-      } else if (role === 'student' && email.includes('student')) {
-          name = '학생';
-      }
-
-      onSignIn(name, role);
-    }, 1000);
+    try {
+        // Simulate auth via service
+        const user = await signIn(email);
+        onSignIn(user);
+    } catch (e) {
+        console.error(e);
+        alert("로그인에 실패했습니다.");
+    } finally {
+        setIsLoading(false);
+    }
   };
 
   return (

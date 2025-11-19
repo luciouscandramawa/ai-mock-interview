@@ -1,4 +1,9 @@
 
+export interface School {
+    id: string;
+    name: string;
+}
+
 export interface Question {
   id: number;
   text: string;
@@ -41,7 +46,10 @@ export interface InterviewReport {
 export interface StudentSummary {
   id: string;
   name: string;
-  major: string;
+  major: string; // Still useful for context, even if not used for filtering
+  schoolId: string;
+  grade: number;       // 1, 2, 3
+  classNumber: number; // 1, 2, 3...
   latestScore: number;
   improvement: number; // as a percentage
   completed: boolean;
@@ -52,13 +60,22 @@ export interface StudentDetail {
     id: string;
     name: string;
     major: string;
+    schoolId: string;
+    grade: number;
+    classNumber: number;
     report?: InterviewReport;
 }
 
 export interface User {
+    id: string;
     name: string;
     email: string;
     role: 'student' | 'teacher';
+    schoolId?: string;
+    schoolName?: string; 
+    grade?: number;       // Year (1, 2, 3)
+    classNumber?: number; // Class (1, 2, 3...) - Optional for teachers
+    className?: string;   // Generated string "1학년 2반"
     avatarUrl?: string;
 }
 

@@ -7,12 +7,13 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   icon?: React.ReactNode;
 }
 
-const Input: React.FC<InputProps> = ({ label, error, icon, className = '', ...props }) => {
+const Input: React.FC<InputProps> = ({ label, error, icon, className = '', required, ...props }) => {
   return (
     <div className={`w-full ${className}`}>
       {label && (
         <label className="block text-sm font-medium text-slate-700 mb-1.5">
           {label}
+          {required && <span className="text-red-500 ml-1">*</span>}
         </label>
       )}
       <div className="relative">
@@ -29,6 +30,7 @@ const Input: React.FC<InputProps> = ({ label, error, icon, className = '', ...pr
             ${icon ? 'pl-10 pr-4' : 'px-4'}
             ${error ? 'border-red-500 focus:ring-red-200 focus:border-red-500' : 'border-slate-300'}
           `}
+          required={required}
           {...props}
         />
       </div>
