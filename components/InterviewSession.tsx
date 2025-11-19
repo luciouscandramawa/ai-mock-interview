@@ -224,7 +224,7 @@ const InterviewSession: React.FC<InterviewSessionProps> = ({ questions, onFinish
             <div className="flex justify-between items-center mb-4">
                 <p className="text-slate-600 font-medium">A. 답변</p>
                 <div className="text-xs bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full flex items-center">
-                    <span className="mr-1">💡</span> 팁: 수치(%)나 숫자를 사용하여 구체적으로 답변해보세요.
+                    <span className="mr-1">💡</span> 팁: "매출이 20% 올랐습니다"처럼 구체적인 수치를 사용하여 답변해보세요.
                 </div>
             </div>
             <textarea

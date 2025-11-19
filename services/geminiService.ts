@@ -78,12 +78,12 @@ export const generateQuestions = async (input: string | { data: string; mimeType
     
     // Jobda / PDF Context for style
     const interviewContext = `
-    참고할 면접 질문 유형 (Jobda 스타일):
-    1. 비전/목표: 입사 후 포부, 5년/10년 후 모습, 직업관, 일의 목적.
-    2. 조직적응력: 상사와의 갈등 해결, 협력 경험, 야근/지방 근무 가능 여부.
-    3. 창의성/돌발: 붉은 벽돌의 5가지 용도, 서울의 중국집 매출 추산 등 논리적 사고.
-    4. 가치관/인성: 존경하는 인물, 감명 깊은 영화, 스트레스 해소법.
-    5. 직무 적합성: 지원 동기, 직무 관련 강점, 전공과 직무의 연관성.
+    참고할 면접 질문 유형 (Jobda 스타일 - 특성화고/직무 중심):
+    1. 비전/목표 (Vision/Goals): 입사 후 포부, 5년/10년 후 모습, 직업관, 일의 목적.
+    2. 조직적응력 (Organizational Adaptability): 상사와의 갈등 해결, 협력 경험, 야근/지방 근무 가능 여부.
+    3. 창의성/돌발 (Spontaneous/Creativity): 붉은 벽돌의 5가지 용도, 서울의 중국집 매출 추산 등 논리적 사고.
+    4. 가치관/인성 (Interests/Values): 존경하는 인물, 감명 깊은 영화, 스트레스 해소법.
+    5. 직무 적합성 (Job Fit): 지원 동기, 직무 관련 강점, 전공과 직무의 연관성.
     `;
 
     const basePrompt = `
@@ -138,13 +138,13 @@ export const evaluateAnswers = async (questions: Question[], answers: Answer[]):
     }).join('\n\n');
 
     const prompt = `
-        당신은 AI 면접관입니다. 학생의 모의 면접 결과를 평가하세요. 
+        당신은 AI 면접관입니다. 특성화고 학생의 모의 면접 결과를 평가하세요. 
         평가 언어는 **한국어**입니다.
 
         다음 4가지 차원에서 점수(0~10)를 매기고 상세 피드백을 제공하세요:
 
         1. **내용 관련성 (Content Relevance - 40%)**: 
-           - 질문의 의도를 정확히 파악했는가? 
+           - 질문의 의도를 정확히 파악하고 의미 있는 답변을 했는가?
            - 핵심 키워드가 포함되었는가?
         
         2. **구조 (Structure - 30%)**:
@@ -157,13 +157,13 @@ export const evaluateAnswers = async (questions: Question[], answers: Answer[]):
            - 단답형이 아닌 충분한 길이로 답변했는가?
 
         4. **자신감 (Confidence Proxy - 10%)**:
-           - 답변의 어조가 확신에 차 있는가?
-           - (텍스트 분석을 통해) 망설임이나 자신감 없는 표현이 적은가?
+           - 답변의 내용에서 확신과 열정이 느껴지는가?
+           - (텍스트 분석) 망설임이나 자신감 없는 표현이 적은가?
 
         **중요 피드백 지침**:
         - 학생에게 **수치로 답변(Quantify)**하도록 적극 권장하세요. (예: "많이 팔았다" 대신 "매출을 20% 늘렸다"라고 표현하도록 조언)
         - 구체적인 개선 방안을 제시하세요.
-
+        
         Transcript:
         ---
         ${interviewTranscript}
@@ -215,7 +215,7 @@ let mockStudentDetailData: { [key: string]: StudentDetail } = {
                 isCorrect: true
             },
             {
-                question: "인턴십 중 문제를 해결한 경험이 있나요?",
+                question: "인턴십 중 문제를 해결한 경험이 있나요?", 
                 answer: "현대 정비소에서 일할 때 하이브리드 시스템 배선 문제가 있었습니다. 진단기를 써서 선배님과 같이 해결했습니다.",
                 evaluation: "STAR 기법을 더 활용해보세요. 본인이 구체적으로 어떤 '행동'을 했는지 강조가 필요합니다.",
                 score: 7.8,
