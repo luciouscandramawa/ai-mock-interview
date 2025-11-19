@@ -1,3 +1,4 @@
+
 // Fix: Added type definitions for the Web Speech API to resolve TypeScript errors about SpeechRecognition.
 // Manually define types for the Web Speech API as they are not standard in all TS lib files.
 interface SpeechRecognitionAlternative {
@@ -119,7 +120,7 @@ const InterviewSession: React.FC<InterviewSessionProps> = ({ questions, onFinish
     recognitionRef.current = recognition;
     recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.lang = 'en-US';
+    recognition.lang = 'ko-KR'; // Set language to Korean
 
     recognition.onresult = (event) => {
       let interimTranscript = '';
@@ -188,7 +189,7 @@ const InterviewSession: React.FC<InterviewSessionProps> = ({ questions, onFinish
 
   const currentQuestion = questions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === questions.length - 1;
-  const isVerbalOnly = currentQuestion.type === 'career-specific';
+  const isCareerQuestion = currentQuestion.type === 'resume-based';
   const progressPercentage = ((currentQuestionIndex + 1) / questions.length) * 100;
 
   return (
@@ -198,11 +199,13 @@ const InterviewSession: React.FC<InterviewSessionProps> = ({ questions, onFinish
           <div className="flex justify-between items-center mb-2">
             <div>
               <span className="text-sm text-slate-500">질문 {currentQuestionIndex + 1} / {questions.length}</span>
-              <span className="ml-3 inline-block capitalize font-medium text-xs text-primary-text bg-primary-lighter px-2 py-1 rounded-full">{currentQuestion.type}</span>
+              <span className={`ml-3 inline-block font-medium text-xs text-primary-text px-2 py-1 rounded-full ${isCareerQuestion ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>
+                {isCareerQuestion ? '이력서/직무 기반' : '일반/인성'}
+              </span>
             </div>
             <div className="flex items-center gap-2 font-sans text-primary font-bold text-2xl">
               <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-              <span>{timeLeft}s</span>
+              <span>{timeLeft}초</span>
             </div>
           </div>
           <div className="w-full bg-slate-200 rounded-full h-2.5">
@@ -211,22 +214,26 @@ const InterviewSession: React.FC<InterviewSessionProps> = ({ questions, onFinish
         </div>
         
         <Card>
-            <p className="text-sm text-slate-500 mb-4 font-semibold tracking-wider uppercase">면접 질문</p>
+            <p className="text-sm text-slate-500 mb-4 font-semibold tracking-wider uppercase">AI 면접관</p>
             <h2 className="text-2xl font-bold text-slate-800 leading-tight">
                 {currentQuestion.text}
             </h2>
         </Card>
 
         <Card>
-            <p className="text-slate-600 mb-4 font-medium">A. 답변을 작성해주세요.</p>
+            <div className="flex justify-between items-center mb-4">
+                <p className="text-slate-600 font-medium">A. 답변</p>
+                <div className="text-xs bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full flex items-center">
+                    <span className="mr-1">💡</span> 팁: 수치(%)나 숫자를 사용하여 구체적으로 답변해보세요.
+                </div>
+            </div>
             <textarea
                 value={currentAnswer}
                 onChange={(e) => setCurrentAnswer(e.target.value)}
-                placeholder={isVerbalOnly ? "음성 전용 질문입니다. 녹음을 시작하려면 마이크를 클릭하세요..." : "답변을 입력하거나 마이크로 녹음하세요..."}
-                readOnly={isVerbalOnly}
-                className="w-full h-48 p-4 bg-white border border-slate-300 rounded-md text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-focus focus:border-primary-focus transition-colors read-only:bg-slate-100 read-only:cursor-not-allowed"
+                placeholder="답변을 입력하거나 마이크 버튼을 눌러 말해보세요..."
+                className="w-full h-48 p-4 bg-white border border-slate-300 rounded-md text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-focus focus:border-primary-focus transition-colors"
             />
-            {!isSpeechSupported && <p className="text-xs text-red-600 mt-2">음성 인식이 지원되지 않거나 권한이 거부되었습니다.</p>}
+            {!isSpeechSupported && <p className="text-xs text-red-600 mt-2">이 브라우저는 음성 인식을 지원하지 않거나 권한이 거부되었습니다.</p>}
             <div className="mt-4 flex justify-between items-center">
                 <button 
                   onClick={toggleRecording}
@@ -242,7 +249,7 @@ const InterviewSession: React.FC<InterviewSessionProps> = ({ questions, onFinish
                     disabled={!currentAnswer.trim()}
                     className="px-8 py-3 bg-primary text-white font-bold rounded-lg hover:bg-primary-dark disabled:bg-slate-400 disabled:cursor-not-allowed focus:outline-none focus:ring-4 focus:ring-primary-focus/50 transition-all duration-300"
                 >
-                    {isLastQuestion ? '완료 및 결과 보기' : '제출 및 다음'}
+                    {isLastQuestion ? '면접 종료 및 결과 확인' : '다음 질문'}
                 </button>
             </div>
         </Card>

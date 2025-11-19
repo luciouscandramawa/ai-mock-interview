@@ -1,3 +1,4 @@
+
 import React from 'react';
 import type { InterviewReport } from '../types';
 import Card from './Card';
@@ -8,98 +9,159 @@ interface ResultsScreenProps {
   onRetry: () => void;
 }
 
-const ScoreCircle: React.FC<{ score: number; label: string }> = ({ score, label }) => {
-    const circumference = 2 * Math.PI * 45;
-    const offset = circumference - (score / 10) * circumference;
-    const colorClass = score >= 8 ? 'text-green-500' : score >= 5 ? 'text-primary' : 'text-red-500';
+// Radar Chart Component
+const RadarChart: React.FC<{ scores: { contentRelevance: number; structure: number; fluency: number; confidence: number } }> = ({ scores }) => {
+    const size = 300;
+    const center = size / 2;
+    const radius = 100;
+    const maxScore = 10;
+
+    // Dimensions
+    const axes = [
+        { label: "내용 관련성", key: "contentRelevance", angle: 0 },      // Top
+        { label: "구조 (STAR)", key: "structure", angle: Math.PI / 2 },   // Right
+        { label: "유창성", key: "fluency", angle: Math.PI },              // Bottom
+        { label: "자신감", key: "confidence", angle: 3 * Math.PI / 2 },   // Left
+    ];
+
+    // Calculate coordinates for a point given a score and angle
+    const getCoordinates = (score: number, angle: number) => {
+        const r = (score / maxScore) * radius;
+        const x = center + r * Math.cos(angle - Math.PI / 2); // Rotate -90deg to start from top
+        const y = center + r * Math.sin(angle - Math.PI / 2);
+        return { x, y };
+    };
+
+    // Background grids (concentric polygons)
+    const levels = [2, 4, 6, 8, 10];
+    const gridPolygons = levels.map(level => {
+        const points = axes.map(axis => {
+            const { x, y } = getCoordinates(level, axis.angle);
+            return `${x},${y}`;
+        }).join(' ');
+        return <polygon key={level} points={points} fill="none" stroke="#e2e8f0" strokeWidth="1" />;
+    });
+
+    // Axis lines
+    const axisLines = axes.map((axis, index) => {
+        const { x, y } = getCoordinates(maxScore, axis.angle);
+        return <line key={index} x1={center} y1={center} x2={x} y2={y} stroke="#cbd5e1" strokeWidth="1" />;
+    });
+
+    // Data polygon
+    const dataPoints = axes.map(axis => {
+        const score = scores[axis.key as keyof typeof scores];
+        const { x, y } = getCoordinates(score, axis.angle);
+        return `${x},${y}`;
+    }).join(' ');
+
+    // Labels
+    const labels = axes.map((axis, index) => {
+         // Push labels out a bit further than the radius
+        const { x, y } = getCoordinates(maxScore + 2.5, axis.angle);
+        return (
+            <text 
+                key={index} 
+                x={x} 
+                y={y} 
+                textAnchor="middle" 
+                dominantBaseline="middle" 
+                className="text-xs font-medium fill-slate-600"
+            >
+                {axis.label}
+            </text>
+        );
+    });
 
     return (
-        <div className="flex flex-col items-center">
-            <div className="relative w-28 h-28">
-                <svg className="w-full h-full" viewBox="0 0 100 100">
-                    <circle
-                        className="text-slate-200"
-                        strokeWidth="10"
-                        stroke="currentColor"
-                        fill="transparent"
-                        r="45"
-                        cx="50"
-                        cy="50"
-                    />
-                    <circle
-                        className={colorClass}
-                        strokeWidth="10"
-                        strokeDasharray={circumference}
-                        strokeDashoffset={offset}
-                        strokeLinecap="round"
-                        stroke="currentColor"
-                        fill="transparent"
-                        r="45"
-                        cx="50"
-                        cy="50"
-                        transform="rotate(-90 50 50)"
-                    />
-                </svg>
-                <span className="absolute inset-0 flex items-center justify-center text-2xl font-bold text-slate-700">{score.toFixed(1)}<span className="text-sm">/10</span></span>
-            </div>
-            <span className="mt-2 text-slate-600">{label}</span>
+        <div className="flex justify-center py-4">
+            <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+                <g>
+                    {gridPolygons}
+                    {axisLines}
+                    <polygon points={dataPoints} fill="rgba(103, 0, 230, 0.2)" stroke="#6700e6" strokeWidth="2" />
+                    {axes.map((axis, i) => {
+                         const score = scores[axis.key as keyof typeof scores];
+                         const { x, y } = getCoordinates(score, axis.angle);
+                         return <circle key={i} cx={x} cy={y} r="4" fill="#6700e6" />
+                    })}
+                    {labels}
+                </g>
+            </svg>
         </div>
     );
 };
 
 
 const ResultsScreen: React.FC<ResultsScreenProps> = ({ report, onRetry }) => {
-  const totalScore = (report.scores.confidence + report.scores.contentRelevance + report.scores.fluency) / 3;
   
   return (
     <div className="space-y-8 animate-fadeIn">
-      <h1 className="text-3xl font-bold text-center text-slate-800">내 결과</h1>
+      <h1 className="text-3xl font-bold text-center text-slate-800">면접 분석 결과</h1>
 
-      <Card>
-        <div className="flex flex-col md:flex-row items-center justify-around gap-8 p-4">
-            <div className="text-center">
-                <h2 className="text-6xl font-bold text-primary">{totalScore.toFixed(1)}</h2>
-                <p className="text-slate-600">종합 점수</p>
-            </div>
-            <div className="w-full md:w-px h-px md:h-24 bg-slate-200"></div>
-            <div className="flex justify-center gap-8">
-                <ScoreCircle score={report.scores.confidence} label="자신감" />
-                <ScoreCircle score={report.scores.contentRelevance} label="관련성" />
-                <ScoreCircle score={report.scores.fluency} label="유창성" />
-            </div>
-        </div>
-      </Card>
+      <div className="grid md:grid-cols-2 gap-6">
+          <Card className="flex flex-col justify-center items-center">
+             <h3 className="text-slate-500 font-medium uppercase tracking-wide mb-2">종합 점수</h3>
+             <div className="relative">
+                <div className="text-6xl font-bold text-primary">{report.totalScore.toFixed(1)}<span className="text-2xl text-slate-400 font-normal">/10</span></div>
+             </div>
+             <div className="mt-4 space-y-1 text-sm text-slate-600">
+                 <div className="flex justify-between w-48 border-b border-slate-100 py-1"><span>내용 관련성 (40%)</span> <span className="font-bold">{report.scores.contentRelevance}</span></div>
+                 <div className="flex justify-between w-48 border-b border-slate-100 py-1"><span>구조 (30%)</span> <span className="font-bold">{report.scores.structure}</span></div>
+                 <div className="flex justify-between w-48 border-b border-slate-100 py-1"><span>유창성 (20%)</span> <span className="font-bold">{report.scores.fluency}</span></div>
+                 <div className="flex justify-between w-48 py-1"><span>자신감 (10%)</span> <span className="font-bold">{report.scores.confidence}</span></div>
+             </div>
+          </Card>
+          
+          <Card>
+              <h3 className="text-center text-slate-500 font-medium uppercase tracking-wide mb-2">역량 분석</h3>
+              <RadarChart scores={report.scores} />
+          </Card>
+      </div>
       
       <div className="grid md:grid-cols-2 gap-8">
         <Card>
-            <h3 className="font-bold text-xl mb-4 text-green-600">강점</h3>
-            <p className="text-slate-600">{report.summary.strengths}</p>
+            <h3 className="font-bold text-xl mb-4 text-green-600 flex items-center gap-2">
+                <CheckCircleIcon className="w-5 h-5" /> 강점
+            </h3>
+            <p className="text-slate-600 leading-relaxed">{report.summary.strengths}</p>
         </Card>
         <Card>
-            <h3 className="font-bold text-xl mb-4 text-primary-text">개선 영역</h3>
-            <p className="text-slate-600">{report.summary.areasForGrowth}</p>
+            <h3 className="font-bold text-xl mb-4 text-primary flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+                개선이 필요한 부분
+            </h3>
+            <p className="text-slate-600 leading-relaxed">{report.summary.areasForGrowth}</p>
         </Card>
       </div>
 
       <div>
-        <h2 className="text-2xl font-bold mb-4 text-slate-800">상세 피드백</h2>
-        <div className="space-y-4">
+        <h2 className="text-2xl font-bold mb-4 text-slate-800">문항별 상세 피드백</h2>
+        <div className="space-y-6">
           {report.detailedFeedback.map((item, index) => (
-            <div key={index} className={`p-6 rounded-lg border ${item.isCorrect ? 'bg-green-50 border-green-200' : 'bg-primary-lightest border-primary-light'}`}>
-              <p className="font-semibold text-slate-700 mb-2">{item.question}</p>
-              <div className="pl-4 border-l-2 border-slate-300">
-                <div className="flex items-center gap-2 mb-2">
-                    <p className="text-sm text-slate-500">내 답변:</p>
-                    {item.isCorrect ? 
-                        <span className="flex items-center text-xs text-green-800 bg-green-100 px-2 py-0.5 rounded-full"><CheckCircleIcon className="w-3 h-3 mr-1"/> 정답</span> : 
-                        <span className="flex items-center text-xs text-primary-text bg-primary-lighter px-2 py-0.5 rounded-full"><XCircleIcon className="w-3 h-3 mr-1"/> 개선 필요</span>
-                    }
-                </div>
-                <p className="text-slate-800 italic mb-4">"{item.answer}"</p>
-                <div className="bg-slate-100 p-4 rounded-lg">
-                    <h4 className="font-semibold text-primary mb-2">AI 피드백 (점수: {item.score}/10)</h4>
-                    <p className="text-sm text-slate-600">{item.evaluation}</p>
-                </div>
+            <div key={index} className={`p-6 rounded-lg border ${item.isCorrect ? 'bg-green-50 border-green-200' : 'bg-white border-slate-200 shadow-sm'}`}>
+              <div className="flex items-start gap-3">
+                  <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${item.isCorrect ? 'bg-green-200 text-green-700' : 'bg-primary-light text-primary'}`}>
+                      Q{index + 1}
+                  </div>
+                  <div className="flex-grow">
+                    <p className="font-semibold text-slate-800 mb-3 text-lg">{item.question}</p>
+                    
+                    <div className="bg-white/60 p-4 rounded-md border border-slate-200 mb-3">
+                        <div className="flex items-center gap-2 mb-2">
+                            <span className="text-xs font-bold uppercase text-slate-500">내 답변</span>
+                        </div>
+                        <p className="text-slate-700 italic">"{item.answer}"</p>
+                    </div>
+
+                    <div className={`p-4 rounded-md ${item.isCorrect ? 'bg-green-100/50' : 'bg-primary-lightest'}`}>
+                         <div className="flex justify-between items-center mb-2">
+                            <h4 className={`font-bold text-sm ${item.isCorrect ? 'text-green-800' : 'text-primary'}`}>AI 코치의 조언</h4>
+                            <span className="font-bold text-sm bg-white px-2 py-1 rounded shadow-sm">점수: {item.score}/10</span>
+                         </div>
+                        <p className="text-sm text-slate-700 leading-relaxed">{item.evaluation}</p>
+                    </div>
+                  </div>
               </div>
             </div>
           ))}
@@ -107,22 +169,26 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ report, onRetry }) => {
       </div>
 
       <Card>
-        <h2 className="text-2xl font-bold mb-4 text-slate-800">다음 단계</h2>
-        <ul className="space-y-3 list-disc list-inside text-slate-600">
+        <h2 className="text-2xl font-bold mb-4 text-slate-800">다음 학습 추천</h2>
+        <ul className="space-y-4">
           {report.nextSteps.map((step, index) => (
-            <li key={index}>
-                <span className="font-semibold text-primary">{step.title}:</span> {step.description}
+            <li key={index} className="flex gap-4 items-start">
+                <div className="bg-primary-light text-primary font-bold rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-1">{index + 1}</div>
+                <div>
+                    <span className="font-bold text-slate-800 block mb-1">{step.title}</span>
+                    <span className="text-slate-600">{step.description}</span>
+                </div>
             </li>
           ))}
         </ul>
       </Card>
 
-      <div className="text-center pt-4">
+      <div className="text-center pt-8 pb-12">
         <button
           onClick={onRetry}
-          className="px-8 py-3 bg-primary text-white font-bold rounded-lg hover:bg-primary-dark focus:outline-none focus:ring-4 focus:ring-primary-focus/50 transition-all duration-300 shadow-lg shadow-primary-focus/20"
+          className="px-10 py-4 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark focus:outline-none focus:ring-4 focus:ring-primary-focus/50 transition-all duration-300 shadow-lg shadow-primary-focus/30 text-lg"
         >
-          다른 주제로 다시 시도
+          새로운 주제로 연습하기
         </button>
       </div>
     </div>

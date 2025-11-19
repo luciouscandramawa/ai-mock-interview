@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import { UploadCloudIcon, FileTextIcon } from './icons';
 
@@ -21,33 +22,26 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
       reader.onload = (e) => {
         const result = e.target?.result as string;
         if (file.type === 'application/pdf') {
-          // result is a data URL like "data:application/pdf;base64,..."
-          // We need to strip the prefix to get the pure base64 data
           const base64Data = result.split(',')[1];
           setFileData({ data: base64Data, mimeType: file.type });
-          // Show a message in the disabled textarea to confirm the PDF is loaded
-          setResumeText(`PDF file "${file.name}" is loaded and ready for analysis.`);
+          setResumeText(`PDF 파일 "${file.name}"이(가) 준비되었습니다.`);
         } else {
-          // For text files, the result is the text content
           setResumeText(result);
         }
       };
       reader.onerror = () => {
-        setResumeText(`Error: Could not read the file "${file.name}".`);
+        setResumeText(`오류: 파일 "${file.name}"을(를) 읽을 수 없습니다.`);
       };
 
       if (file.type === 'application/pdf') {
-        // For PDF, read as data URL to get base64 encoding
         reader.readAsDataURL(file);
       } else {
-        // For text, read as plain text
         reader.readAsText(file);
       }
     }
   }, []);
   
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    // If the user starts typing/pasting, clear the file upload state.
     setFileName('');
     setFileData(null);
     setResumeText(e.target.value);
@@ -65,38 +59,41 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-12rem)] text-center animate-fadeIn">
-      <div className="bg-white p-6 rounded-lg shadow-lg max-w-2xl w-full border border-slate-200">
-        <h1 className="text-3xl font-semibold text-slate-800 mb-2">AI 면접 코치</h1>
-        <p className="text-slate-600 mb-8">이력서 또는 자기소개서를 업로드하거나 붙여넣기하시면, 맞춤형 면접 질문으로 연습할 수 있습니다.</p>
+      <div className="bg-white p-8 rounded-2xl shadow-xl max-w-2xl w-full border border-slate-200">
+        <h1 className="text-3xl font-bold text-slate-800 mb-3">AI 면접 코치</h1>
+        <p className="text-slate-600 mb-8 leading-relaxed">
+            이력서나 자기소개서를 업로드하면, 직무 역량과 인성을 평가하는<br/>
+            맞춤형 면접 질문을 생성해드립니다.
+        </p>
         
-        <div className="mb-6">
+        <div className="mb-6 relative">
             <textarea
-                className="w-full h-32 p-4 bg-white border border-slate-300 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-focus focus:border-primary-focus transition-colors disabled:bg-slate-100 disabled:text-slate-500"
-                placeholder="이력서 또는 자기소개서 붙여넣기"
+                className="w-full h-36 p-4 bg-slate-50 border border-slate-300 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-focus focus:border-primary-focus transition-colors disabled:bg-slate-100 disabled:text-slate-500 resize-none"
+                placeholder="여기에 자기소개서 내용을 직접 붙여넣기 하세요..."
                 value={resumeText}
                 onChange={handleTextChange}
-                disabled={!!fileData} // Disable textarea when a file is selected.
+                disabled={!!fileData} 
             />
         </div>
 
         <div className="flex items-center justify-center w-full mb-6">
             <div className="flex-grow border-t border-slate-200"></div>
-            <span className="text-slate-400 mx-4 flex-shrink-0 text-sm">또는</span>
+            <span className="text-slate-400 mx-4 flex-shrink-0 text-sm font-medium">또는 파일 업로드</span>
             <div className="flex-grow border-t border-slate-200"></div>
         </div>
 
-        <label htmlFor="file-upload" className="w-full cursor-pointer bg-slate-50 border-2 border-dashed border-slate-300 rounded-lg p-6 flex flex-col items-center justify-center hover:border-primary hover:bg-primary-lightest transition-all duration-300">
+        <label htmlFor="file-upload" className="w-full cursor-pointer bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl p-8 flex flex-col items-center justify-center hover:border-primary hover:bg-primary-lightest transition-all duration-300 group">
           {fileName ? (
             <>
-              <FileTextIcon className="w-10 h-10 text-primary mb-3" />
-              <span className="text-slate-700 font-medium">{fileName}</span>
-              <span className="text-slate-500 text-sm mt-1">다른 파일을 선택하려면 클릭하세요</span>
+              <FileTextIcon className="w-12 h-12 text-primary mb-3" />
+              <span className="text-slate-700 font-semibold text-lg">{fileName}</span>
+              <span className="text-slate-500 text-sm mt-2">다른 파일을 선택하려면 클릭하세요</span>
             </>
           ) : (
              <>
-              <UploadCloudIcon className="w-10 h-10 text-slate-500 mb-3" />
-              <span className="text-slate-700 font-medium">이력서를 업로드하려면 클릭하세요.</span>
-              <span className="text-slate-500 text-sm mt-1">.txt, .md, or .pdf</span>
+              <UploadCloudIcon className="w-12 h-12 text-slate-400 group-hover:text-primary mb-3 transition-colors" />
+              <span className="text-slate-700 font-medium">이력서 파일 업로드</span>
+              <span className="text-slate-400 text-sm mt-2">PDF, TXT, MD 형식 지원</span>
             </>
           )}
         </label>
@@ -105,9 +102,9 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
         <button
           onClick={handleStartClick}
           disabled={isStartDisabled}
-          className="w-full mt-8 bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-primary-dark focus:outline-none focus:ring-4 focus:ring-primary-focus/50 transition-all duration-300 text-sm shadow-lg shadow-primary-focus/20 disabled:bg-slate-400 disabled:cursor-not-allowed disabled:shadow-none"
+          className="w-full mt-8 bg-primary text-white font-bold py-4 px-6 rounded-xl hover:bg-primary-dark focus:outline-none focus:ring-4 focus:ring-primary-focus/50 transition-all duration-300 text-lg shadow-lg shadow-primary-focus/20 disabled:bg-slate-300 disabled:cursor-not-allowed disabled:shadow-none"
         >
-          면접 시작
+          면접 시작하기
         </button>
       </div>
     </div>

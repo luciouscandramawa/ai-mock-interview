@@ -2,7 +2,7 @@
 export interface Question {
   id: number;
   text: string;
-  type: 'general' | 'career-specific';
+  type: 'general' | 'resume-based';
 }
 
 export interface Answer {
@@ -20,10 +20,12 @@ export interface DetailedFeedback {
 
 export interface InterviewReport {
   scores: {
-    confidence: number;
-    contentRelevance: number;
-    fluency: number;
+    contentRelevance: number; // 40%
+    structure: number;        // 30%
+    fluency: number;          // 20%
+    confidence: number;       // 10%
   };
+  totalScore: number;
   summary: {
     strengths: string;
     areasForGrowth: string;

@@ -37,34 +37,34 @@ const StudentDetailView: React.FC<StudentDetailViewProps> = ({ studentId, onBack
   return (
     <div className="container mx-auto animate-fadeIn">
         <div className="flex items-center gap-4 mb-6">
-            <button onClick={onBack} className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-800 transition-colors">
+            <button onClick={onBack} className="flex items-center gap-2 text-sm text-slate-500 hover:text-primary transition-colors font-medium">
                 <ArrowLeftIcon className="w-4 h-4"/>
                 대시보드로 돌아가기
             </button>
         </div>
       <div className="flex items-baseline justify-between mb-6">
         <div>
-            <h1 className="text-3xl font-semibold text-slate-800">{student.name}</h1>
-            <p className="text-lg text-primary">{student.major}</p>
+            <h1 className="text-3xl font-bold text-slate-800">{student.name}</h1>
+            <p className="text-lg text-primary font-medium">{student.major}</p>
         </div>
       </div>
 
       <Card>
-        <h2 className="text-xl font-semibold mb-2 text-slate-800">AI Progress Summary</h2>
-        <p className="text-slate-600 italic">"{student.progressSummary}"</p>
+        <h2 className="text-xl font-bold mb-2 text-slate-800">AI 진행 요약</h2>
+        <p className="text-slate-600 italic bg-slate-50 p-4 rounded-lg border border-slate-100">"{student.progressSummary}"</p>
       </Card>
 
       {student.sessions && student.sessions.length > 0 && (
         <Card className="mt-8">
-            <h2 className="text-xl font-semibold mb-4 text-slate-800">Session Scores Breakdown</h2>
-            <div className="flex gap-4 overflow-x-auto p-2 justify-center">
+            <h2 className="text-xl font-bold mb-4 text-slate-800">회차별 점수 추이</h2>
+            <div className="flex gap-4 overflow-x-auto p-4 justify-center bg-slate-50 rounded-lg">
             {student.sessions.map((session, index) => (
-                <div key={index} className="flex flex-col items-center gap-2 flex-shrink-0 w-16 text-center">
-                <div className="w-8 h-40 bg-slate-200 rounded-full flex items-end relative" title={`Score: ${session.score.toFixed(1)}/10`}>
-                    <div className="w-full bg-primary rounded-full transition-all duration-500" style={{ height: `${session.score * 10}%` }}></div>
+                <div key={index} className="flex flex-col items-center gap-2 flex-shrink-0 w-16 text-center group">
+                <div className="w-10 h-40 bg-white border border-slate-200 rounded-full flex items-end relative shadow-sm overflow-hidden" title={`점수: ${session.score.toFixed(1)}/10`}>
+                    <div className="w-full bg-primary group-hover:bg-primary-focus transition-all duration-500" style={{ height: `${session.score * 10}%` }}></div>
                 </div>
-                <span className="text-xs text-slate-500">Q{index + 1}</span>
-                <span className="text-sm font-bold text-slate-700">{session.score.toFixed(1)}</span>
+                <span className="text-xs font-bold text-slate-500">Q{index + 1}</span>
+                <span className="text-sm font-bold text-primary">{session.score.toFixed(1)}</span>
                 </div>
             ))}
             </div>
@@ -72,23 +72,26 @@ const StudentDetailView: React.FC<StudentDetailViewProps> = ({ studentId, onBack
       )}
       
       <div className="mt-8">
-        <h2 className="text-2xl font-bold mb-4 text-slate-800">Latest Mock Interview Session</h2>
+        <h2 className="text-2xl font-bold mb-4 text-slate-800">최근 모의 면접 상세</h2>
         <div className="space-y-6">
             {student.sessions.map((session, index) => (
-                 <div key={index} className={`p-6 rounded-lg border ${session.isCorrect ? 'bg-green-50 border-green-200' : 'bg-primary-lightest border-primary-light'}`}>
-                    <p className="font-semibold text-slate-700 mb-2">질문 {index + 1}: {session.question}</p>
-                    <div className="pl-4 border-l-2 border-slate-300">
+                 <div key={index} className={`p-6 rounded-lg border ${session.isCorrect ? 'bg-green-50 border-green-200' : 'bg-white border-slate-200 shadow-sm'}`}>
+                    <p className="font-bold text-slate-800 mb-3 text-lg">Q{index + 1}. {session.question}</p>
+                    <div className="pl-4 border-l-4 border-slate-200 ml-1">
                         <div className="flex items-center gap-2 mb-2">
-                            <p className="text-sm text-slate-500">학생의 답변:</p>
+                            <p className="text-xs font-bold text-slate-500 uppercase">학생 답변</p>
                             {session.isCorrect ? 
-                                <span className="flex items-center text-xs text-green-800 bg-green-100 px-2 py-0.5 rounded-full"><CheckCircleIcon className="w-3 h-3 mr-1"/> 잘했어요</span> : 
-                                <span className="flex items-center text-xs text-primary-text bg-primary-lighter px-2 py-0.5 rounded-full"><XCircleIcon className="w-3 h-3 mr-1"/> 개선 필요</span>
+                                <span className="flex items-center text-xs font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded-full"><CheckCircleIcon className="w-3 h-3 mr-1"/> 우수</span> : 
+                                <span className="flex items-center text-xs font-bold text-red-600 bg-red-100 px-2 py-0.5 rounded-full"><XCircleIcon className="w-3 h-3 mr-1"/> 보완 필요</span>
                             }
                         </div>
-                        <p className="text-slate-800 italic mb-4">"{session.answer}"</p>
+                        <p className="text-slate-700 italic mb-4 bg-white/50 p-3 rounded">"{session.answer}"</p>
                         <div className="bg-slate-100 p-4 rounded-lg">
-                            <h4 className="font-semibold text-primary mb-2">AI 피드백 (점수: {session.score}/10)</h4>
-                            <p className="text-sm text-slate-600">{session.evaluation}</p>
+                            <h4 className="font-bold text-primary mb-1 flex justify-between">
+                                <span>AI 피드백</span>
+                                <span className="bg-white px-2 rounded text-sm shadow-sm text-slate-800">점수: {session.score}/10</span>
+                            </h4>
+                            <p className="text-sm text-slate-600 leading-relaxed">{session.evaluation}</p>
                         </div>
                     </div>
                 </div>
@@ -98,7 +101,7 @@ const StudentDetailView: React.FC<StudentDetailViewProps> = ({ studentId, onBack
 
        <div className="mt-8">
         <Card>
-          <h2 className="text-xl font-semibold mb-4 text-slate-800">교사 코멘트 추가</h2>
+          <h2 className="text-xl font-bold mb-4 text-slate-800">교사 코멘트 작성</h2>
           <textarea
             value={teacherComment}
             onChange={(e) => setTeacherComment(e.target.value)}
