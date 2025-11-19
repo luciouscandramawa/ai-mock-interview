@@ -197,7 +197,7 @@ const InterviewSession: React.FC<InterviewSessionProps> = ({ questions, onFinish
         <div>
           <div className="flex justify-between items-center mb-2">
             <div>
-              <span className="text-sm text-slate-500">Question {currentQuestionIndex + 1} of {questions.length}</span>
+              <span className="text-sm text-slate-500">질문 {currentQuestionIndex + 1} / {questions.length}</span>
               <span className="ml-3 inline-block capitalize font-medium text-xs text-primary-text bg-primary-lighter px-2 py-1 rounded-full">{currentQuestion.type}</span>
             </div>
             <div className="flex items-center gap-2 font-sans text-primary font-bold text-2xl">
@@ -211,28 +211,28 @@ const InterviewSession: React.FC<InterviewSessionProps> = ({ questions, onFinish
         </div>
         
         <Card>
-            <p className="text-sm text-slate-500 mb-4 font-semibold tracking-wider uppercase">Interview Question</p>
+            <p className="text-sm text-slate-500 mb-4 font-semibold tracking-wider uppercase">면접 질문</p>
             <h2 className="text-2xl font-bold text-slate-800 leading-tight">
                 {currentQuestion.text}
             </h2>
         </Card>
 
         <Card>
-            <p className="text-slate-600 mb-4 font-medium">A. Please fill out the answer.</p>
+            <p className="text-slate-600 mb-4 font-medium">A. 답변을 작성해주세요.</p>
             <textarea
                 value={currentAnswer}
                 onChange={(e) => setCurrentAnswer(e.target.value)}
-                placeholder={isVerbalOnly ? "This is a verbal-only question. Click the microphone to record..." : "Type or use the microphone to record your answer..."}
+                placeholder={isVerbalOnly ? "음성 전용 질문입니다. 녹음을 시작하려면 마이크를 클릭하세요..." : "답변을 입력하거나 마이크로 녹음하세요..."}
                 readOnly={isVerbalOnly}
                 className="w-full h-48 p-4 bg-white border border-slate-300 rounded-md text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-focus focus:border-primary-focus transition-colors read-only:bg-slate-100 read-only:cursor-not-allowed"
             />
-            {!isSpeechSupported && <p className="text-xs text-red-600 mt-2">Speech recognition is not supported or permission was denied.</p>}
+            {!isSpeechSupported && <p className="text-xs text-red-600 mt-2">음성 인식이 지원되지 않거나 권한이 거부되었습니다.</p>}
             <div className="mt-4 flex justify-between items-center">
                 <button 
                   onClick={toggleRecording}
                   disabled={!isSpeechSupported}
                   className="relative p-3 rounded-full hover:bg-primary-lightest disabled:opacity-50 disabled:cursor-not-allowed transition-colors" 
-                  aria-label={isRecording ? "Stop recording" : "Use microphone"}
+                  aria-label={isRecording ? "녹음 중지" : "마이크 사용"}
                 >
                     {isRecording ? <StopCircleIcon className="w-6 h-6 text-red-500" /> : <MicIcon className="w-6 h-6 text-slate-500" />}
                     {isRecording && <span className="absolute top-0 left-0 w-full h-full bg-red-500 rounded-full animate-ping opacity-50"></span>}
@@ -242,7 +242,7 @@ const InterviewSession: React.FC<InterviewSessionProps> = ({ questions, onFinish
                     disabled={!currentAnswer.trim()}
                     className="px-8 py-3 bg-primary text-white font-bold rounded-lg hover:bg-primary-dark disabled:bg-slate-400 disabled:cursor-not-allowed focus:outline-none focus:ring-4 focus:ring-primary-focus/50 transition-all duration-300"
                 >
-                    {isLastQuestion ? 'Finish & See Results' : 'Submit & Next'}
+                    {isLastQuestion ? '완료 및 결과 보기' : '제출 및 다음'}
                 </button>
             </div>
         </Card>
