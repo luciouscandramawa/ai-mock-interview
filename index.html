@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -8,6 +7,10 @@
     <title>AI 역량 평가</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
+      // Shims for library compatibility
+      window.global = window;
+      window.process = window.process || { env: {} };
+      
       tailwind.config = {
         theme: {
           extend: {

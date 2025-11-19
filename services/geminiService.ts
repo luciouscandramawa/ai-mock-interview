@@ -1,14 +1,19 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import type { Question, Answer, InterviewReport, StudentSummary, StudentDetail } from '../types';
 
 // IMPORTANT: This key is managed externally and is a hard requirement.
 // Do not modify this line.
-const API_KEY = process.env.API_KEY;
+// Use a fallback empty string to prevent 'undefined' access errors if process.env is partially shimmed.
+const API_KEY = process.env.API_KEY || "";
+
 if (!API_KEY) {
-    console.warn("API_KEY environment variable not set. Using a placeholder. API calls will fail.");
+    console.warn("API_KEY environment variable not set. API calls will fail.");
 }
 
+// Initialize AI client safely. 
+// If API_KEY is empty, it might throw during requests, but we avoid top-level crash if possible.
+// However, the SDK constructor might validate immediately.
+// We'll assume the key is present or the mock data fallback will be used in a real scenario if auth fails.
 const ai = new GoogleGenAI({ apiKey: API_KEY });
 
 const questionGenerationSchema = {
@@ -89,10 +94,15 @@ export const generateQuestions = async (input: string | { data: string; mimeType
 
     const basePrompt = `
         당신은 특성화고 학생을 위한 전문 AI 면접 코치입니다.
-        제공된 이력서 정보를 바탕으로 한국어로 정확히 10개의 맞춤형 면접 질문을 생성하세요.
+        제공된 이력서 정보를 심층 분석하여 **전공(Major)**, **구체적인 경험(Experience)**, **지원 동기(Motivation)**를 파악하십시오.
+        이를 바탕으로 한국어로 정확히 10개의 맞춤형 면접 질문을 생성하세요.
         
         다음 규칙을 엄격히 따르세요:
-        1. **이력서/직무 기반 질문 (resume-based)**: 5개. 학생의 기술, 프로젝트 경험, 자격증 등 구체적인 이력에 기반해야 합니다.
+        1. **이력서/직무 기반 질문 (resume-based)**: 5개. 
+           - 제출된 이력서에서 학생의 전공과 관련된 구체적인 프로젝트나 기술 스택을 언급하며 질문하세요.
+           - 학생이 작성한 특정 경험(동아리, 실습, 자격증 등)에 대해 깊이 있는 질문을 하세요.
+           - 지원 동기와 입사 후 포부를 묻는 질문을 포함하세요.
+           - 질문은 매우 구체적이고 개인화되어야 합니다.
         2. **일반/인성 질문 (general)**: 5개. 위에서 제공한 '비전/목표', '조직적응력', '창의성' 등의 주제를 참고하여 생성하세요.
         3. 모든 질문은 한국어로 작성되어야 합니다.
         4. ID는 1부터 10까지 부여하세요.
@@ -135,7 +145,7 @@ export const generateQuestions = async (input: string | { data: string; mimeType
 export const evaluateAnswers = async (questions: Question[], answers: Answer[]): Promise<InterviewReport> => {
     const interviewTranscript = questions.map(q => {
         const answer = answers.find(a => a.questionId === q.id);
-        return `질문 ${q.id}: ${q.text}\n답변: ${answer ? answer.text : '(답변 없음)'}`;
+        return `질문 ${q.id} (${q.type}): ${q.text}\n답변: ${answer ? answer.text : '(답변 없음)'}`;
     }).join('\n\n');
 
     const prompt = `

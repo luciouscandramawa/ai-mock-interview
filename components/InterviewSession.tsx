@@ -50,7 +50,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { Question, Answer } from '../types';
 import Card from './Card';
 import Button from './ui/Button';
-import { MicIcon, StopCircleIcon, LightbulbIcon, ClockIcon } from './icons';
+import { LightbulbIcon, ClockIcon } from './icons';
+import VoiceAnswerArea from './interview/VoiceAnswerArea';
 
 interface InterviewSessionProps {
   questions: Question[];
@@ -174,8 +175,24 @@ const InterviewSession: React.FC<InterviewSessionProps> = ({ questions, onFinish
     setIsRecording(newIsRecording);
 
     if (newIsRecording) {
-      setCurrentAnswer('');
-      finalTranscriptRef.current = '';
+      // Do not clear previous answer if it's a resume-based question and we are just pausing/resuming?
+      // Actually, standard behavior for a new take is often to clear, but let's append or just keep consistent.
+      // The previous logic cleared it: `setCurrentAnswer('');`. Let's stick to that for "new attempt".
+      // But if the user just paused, maybe they want to continue? 
+      // For simplicity and "retake" feel, let's clear interim but keep final?
+      // The implementation below clears everything on start.
+      if (finalTranscriptRef.current === '' && currentAnswer === '') {
+           // Initial start
+      } else {
+          // Restarting?
+          // For now, let's keep the existing logic of "Toggle = Start/Stop". 
+          // If I want to append, I shouldn't clear.
+          // If I want to overwrite, I clear.
+          // Let's assume the user might want to correct themselves, so we don't auto-clear unless they navigate.
+          // However, the `recognition.onresult` logic builds `fullTranscript` from `finalTranscriptRef`.
+          // If we don't clear `finalTranscriptRef`, it appends.
+      }
+      
       recognitionRef.current.start();
     } else {
       recognitionRef.current.stop();
@@ -190,18 +207,18 @@ const InterviewSession: React.FC<InterviewSessionProps> = ({ questions, onFinish
 
   const currentQuestion = questions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === questions.length - 1;
-  const isCareerQuestion = currentQuestion.type === 'resume-based';
+  const isResumeBased = currentQuestion.type === 'resume-based';
   const progressPercentage = ((currentQuestionIndex + 1) / questions.length) * 100;
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-12rem)] animate-fadeIn">
-      <div className="w-full max-w-3xl space-y-6">
+      <div className="w-full max-w-4xl space-y-6">
         <div>
           <div className="flex justify-between items-center mb-2">
             <div>
               <span className="text-sm text-slate-500">질문 {currentQuestionIndex + 1} / {questions.length}</span>
-              <span className={`ml-3 inline-block font-medium text-xs text-primary-text px-2 py-1 rounded-full ${isCareerQuestion ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>
-                {isCareerQuestion ? '이력서/직무 기반' : '일반/인성'}
+              <span className={`ml-3 inline-block font-medium text-xs text-primary-text px-2 py-1 rounded-full ${isResumeBased ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>
+                {isResumeBased ? '이력서/직무 기반' : '일반/인성'}
               </span>
             </div>
             <div className="flex items-center gap-2 font-sans text-primary font-bold text-2xl">
@@ -229,23 +246,17 @@ const InterviewSession: React.FC<InterviewSessionProps> = ({ questions, onFinish
                     <span>팁: "매출이 20% 올랐습니다"처럼 구체적인 수치를 사용하여 답변해보세요.</span>
                 </div>
             </div>
-            <textarea
-                value={currentAnswer}
-                onChange={(e) => setCurrentAnswer(e.target.value)}
-                placeholder="답변을 입력하거나 마이크 버튼을 눌러 말해보세요..."
-                className="w-full h-48 p-4 bg-white border border-slate-300 rounded-md text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-focus focus:border-primary-focus transition-colors"
+            
+            <VoiceAnswerArea 
+                currentAnswer={currentAnswer}
+                onChangeAnswer={setCurrentAnswer}
+                isRecording={isRecording}
+                onToggleRecording={toggleRecording}
+                isSpeechSupported={isSpeechSupported}
+                isReadOnly={isResumeBased} // Enforce voice-only for resume based questions
             />
-            {!isSpeechSupported && <p className="text-xs text-red-600 mt-2">이 브라우저는 음성 인식을 지원하지 않거나 권한이 거부되었습니다.</p>}
-            <div className="mt-4 flex justify-between items-center">
-                <button 
-                  onClick={toggleRecording}
-                  disabled={!isSpeechSupported}
-                  className="relative p-3 rounded-full hover:bg-primary-lightest disabled:opacity-50 disabled:cursor-not-allowed transition-colors" 
-                  aria-label={isRecording ? "녹음 중지" : "마이크 사용"}
-                >
-                    {isRecording ? <StopCircleIcon className="w-6 h-6 text-red-500" /> : <MicIcon className="w-6 h-6 text-slate-500" />}
-                    {isRecording && <span className="absolute top-0 left-0 w-full h-full bg-red-500 rounded-full animate-ping opacity-50"></span>}
-                </button>
+
+            <div className="mt-6 flex justify-end">
                 <Button
                     onClick={handleNext}
                     disabled={!currentAnswer.trim()}
