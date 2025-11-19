@@ -33,15 +33,15 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onSelectStudent }) 
   return (
     <div className="container mx-auto animate-fadeIn">
        <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-semibold text-slate-800">교사 대시보드</h1>
+            <h1 className="text-3xl font-semibold text-slate-800">Teacher Dashboard</h1>
         </div>
       <div className="bg-white border border-slate-200 rounded-lg shadow-md overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm text-left text-slate-600">
             <thead className="text-xs text-slate-500 uppercase bg-slate-50">
               <tr>
-                <th scope="col" className="px-6 py-4 font-semibold">학생 이름</th>
-                <th scope="col" className="px-6 py-4 font-semibold">전공</th>
+                <th scope="col" className="px-6 py-4 font-semibold">Student Name</th>
+                <th scope="col" className="px-6 py-4 font-semibold">Major</th>
                 <th scope="col" className="px-6 py-4 font-semibold">Status</th>
                 <th scope="col" className="px-6 py-4 font-semibold text-center">Latest Score</th>
                 <th scope="col" className="px-6 py-4 font-semibold text-center">Improvement</th>

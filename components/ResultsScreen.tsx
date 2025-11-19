@@ -53,51 +53,51 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ report, onRetry }) => {
   
   return (
     <div className="space-y-8 animate-fadeIn">
-      <h1 className="text-3xl font-bold text-center text-slate-800">내 결과</h1>
+      <h1 className="text-3xl font-bold text-center text-slate-800">Your Results</h1>
 
       <Card>
         <div className="flex flex-col md:flex-row items-center justify-around gap-8 p-4">
             <div className="text-center">
                 <h2 className="text-6xl font-bold text-primary">{totalScore.toFixed(1)}</h2>
-                <p className="text-slate-600">종합 점수</p>
+                <p className="text-slate-600">Overall Score</p>
             </div>
             <div className="w-full md:w-px h-px md:h-24 bg-slate-200"></div>
             <div className="flex justify-center gap-8">
-                <ScoreCircle score={report.scores.confidence} label="자신감" />
-                <ScoreCircle score={report.scores.contentRelevance} label="관련성" />
-                <ScoreCircle score={report.scores.fluency} label="유창성" />
+                <ScoreCircle score={report.scores.confidence} label="Confidence" />
+                <ScoreCircle score={report.scores.contentRelevance} label="Relevance" />
+                <ScoreCircle score={report.scores.fluency} label="Fluency" />
             </div>
         </div>
       </Card>
       
       <div className="grid md:grid-cols-2 gap-8">
         <Card>
-            <h3 className="font-bold text-xl mb-4 text-green-600">강점</h3>
+            <h3 className="font-bold text-xl mb-4 text-green-600">Strengths</h3>
             <p className="text-slate-600">{report.summary.strengths}</p>
         </Card>
         <Card>
-            <h3 className="font-bold text-xl mb-4 text-primary-text">개선 영역</h3>
+            <h3 className="font-bold text-xl mb-4 text-primary-text">Areas for Growth</h3>
             <p className="text-slate-600">{report.summary.areasForGrowth}</p>
         </Card>
       </div>
 
       <div>
-        <h2 className="text-2xl font-bold mb-4 text-slate-800">상세 피드백</h2>
+        <h2 className="text-2xl font-bold mb-4 text-slate-800">Detailed Feedback</h2>
         <div className="space-y-4">
           {report.detailedFeedback.map((item, index) => (
             <div key={index} className={`p-6 rounded-lg border ${item.isCorrect ? 'bg-green-50 border-green-200' : 'bg-primary-lightest border-primary-light'}`}>
               <p className="font-semibold text-slate-700 mb-2">{item.question}</p>
               <div className="pl-4 border-l-2 border-slate-300">
                 <div className="flex items-center gap-2 mb-2">
-                    <p className="text-sm text-slate-500">내 답변:</p>
+                    <p className="text-sm text-slate-500">Your Answer:</p>
                     {item.isCorrect ? 
-                        <span className="flex items-center text-xs text-green-800 bg-green-100 px-2 py-0.5 rounded-full"><CheckCircleIcon className="w-3 h-3 mr-1"/> 정답</span> : 
-                        <span className="flex items-center text-xs text-primary-text bg-primary-lighter px-2 py-0.5 rounded-full"><XCircleIcon className="w-3 h-3 mr-1"/> 개선 필요</span>
+                        <span className="flex items-center text-xs text-green-800 bg-green-100 px-2 py-0.5 rounded-full"><CheckCircleIcon className="w-3 h-3 mr-1"/> Correct</span> : 
+                        <span className="flex items-center text-xs text-primary-text bg-primary-lighter px-2 py-0.5 rounded-full"><XCircleIcon className="w-3 h-3 mr-1"/> Needs Work</span>
                     }
                 </div>
                 <p className="text-slate-800 italic mb-4">"{item.answer}"</p>
                 <div className="bg-slate-100 p-4 rounded-lg">
-                    <h4 className="font-semibold text-primary mb-2">AI 피드백 (점수: {item.score}/10)</h4>
+                    <h4 className="font-semibold text-primary mb-2">AI Feedback (Score: {item.score}/10)</h4>
                     <p className="text-sm text-slate-600">{item.evaluation}</p>
                 </div>
               </div>
@@ -107,7 +107,7 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ report, onRetry }) => {
       </div>
 
       <Card>
-        <h2 className="text-2xl font-bold mb-4 text-slate-800">다음 단계</h2>
+        <h2 className="text-2xl font-bold mb-4 text-slate-800">Next Steps</h2>
         <ul className="space-y-3 list-disc list-inside text-slate-600">
           {report.nextSteps.map((step, index) => (
             <li key={index}>
@@ -122,7 +122,7 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ report, onRetry }) => {
           onClick={onRetry}
           className="px-8 py-3 bg-primary text-white font-bold rounded-lg hover:bg-primary-dark focus:outline-none focus:ring-4 focus:ring-primary-focus/50 transition-all duration-300 shadow-lg shadow-primary-focus/20"
         >
-          다른 주제로 다시 시도
+          Try Another Topic
         </button>
       </div>
     </div>

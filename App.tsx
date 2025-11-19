@@ -15,8 +15,8 @@ const AdminHeader: React.FC = () => (
     <div className="flex items-center gap-4">
       <span className="text-3xl" role="img" aria-label="Teacher">👩‍🏫</span>
       <div>
-        <h2 className="font-bold text-slate-800">관리자가 할 수 있는 일</h2>
-        <p className="text-sm text-slate-600">조직을 위한 커리큘럼을 만들고 사용자를 초대하세요!</p>
+        <h2 className="font-bold text-slate-800">What an Admin can do</h2>
+        <p className="text-sm text-slate-600">Create a curriculum for your organization and invite users!</p>
       </div>
     </div>
   </div>
@@ -50,7 +50,7 @@ const App: React.FC = () => {
       setQuestions(generatedQuestions);
       setView('session');
     } catch (err) {
-      setError('질문 생성에 실패했습니다. 다시 시도해주세요.');
+      setError('Failed to generate questions. Please try again.');
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -67,7 +67,7 @@ const App: React.FC = () => {
       setView('results');
     } catch (err)
      {
-      setError('답변 평가에 실패했습니다. 다시 시도해주세요.');
+      setError('Failed to evaluate answers. Please try again.');
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -95,7 +95,7 @@ const App: React.FC = () => {
       return (
         <div className="flex flex-col items-center justify-center h-screen text-slate-700">
           <div className="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-primary"></div>
-          <p className="mt-4 text-lg">AI가 작업 중입니다...</p>
+          <p className="mt-4 text-lg">AI is working its magic...</p>
         </div>
       );
     }
@@ -104,7 +104,7 @@ const App: React.FC = () => {
        return (
         <div className="flex flex-col items-center justify-center h-screen text-slate-700">
             <div className="bg-red-100 border border-red-400 p-6 rounded-lg text-center shadow-lg">
-                <h2 className="text-xl font-bold mb-2 text-red-800">오류가 발생했습니다</h2>
+                <h2 className="text-xl font-bold mb-2 text-red-800">An Error Occurred</h2>
                 <p className="text-red-700">{error}</p>
                 <button 
                     onClick={() => {
@@ -113,7 +113,7 @@ const App: React.FC = () => {
                     }} 
                     className="mt-4 px-4 py-2 bg-primary text-white hover:bg-primary-dark rounded-md transition-colors"
                 >
-                    처음으로 돌아가기
+                    Back to Start
                 </button>
             </div>
         </div>
@@ -148,7 +148,7 @@ const App: React.FC = () => {
                 : 'text-slate-500 hover:bg-slate-200'
             }`}
           >
-            학생 모드
+            User view
           </button>
           <button
             onClick={() => handleModeToggle(true)}
@@ -158,7 +158,7 @@ const App: React.FC = () => {
                 : 'text-slate-500 hover:bg-slate-200'
             }`}
           >
-            교사 모드
+            Admin mode
           </button>
         </div>
       </div>

@@ -66,13 +66,13 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-12rem)] text-center animate-fadeIn">
       <div className="bg-white p-6 rounded-lg shadow-lg max-w-2xl w-full border border-slate-200">
-        <h1 className="text-3xl font-semibold text-slate-800 mb-2">AI 면접 코치</h1>
-        <p className="text-slate-600 mb-8">이력서 또는 자기소개서를 업로드하거나 붙여넣기하시면, 맞춤형 면접 질문으로 연습할 수 있습니다.</p>
+        <h1 className="text-3xl font-semibold text-slate-800 mb-2">AI Interview Coach</h1>
+        <p className="text-slate-600 mb-8">Upload your resume or paste your self-introduction to get personalized interview questions and practice like a pro.</p>
         
         <div className="mb-6">
             <textarea
                 className="w-full h-32 p-4 bg-white border border-slate-300 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-focus focus:border-primary-focus transition-colors disabled:bg-slate-100 disabled:text-slate-500"
-                placeholder="이력서 또는 자기소개서 붙여넣기"
+                placeholder="Paste your resume/CV here..."
                 value={resumeText}
                 onChange={handleTextChange}
                 disabled={!!fileData} // Disable textarea when a file is selected.
@@ -81,7 +81,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
 
         <div className="flex items-center justify-center w-full mb-6">
             <div className="flex-grow border-t border-slate-200"></div>
-            <span className="text-slate-400 mx-4 flex-shrink-0 text-sm">또는</span>
+            <span className="text-slate-400 mx-4 flex-shrink-0 text-sm">OR</span>
             <div className="flex-grow border-t border-slate-200"></div>
         </div>
 
@@ -90,12 +90,12 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
             <>
               <FileTextIcon className="w-10 h-10 text-primary mb-3" />
               <span className="text-slate-700 font-medium">{fileName}</span>
-              <span className="text-slate-500 text-sm mt-1">다른 파일을 선택하려면 클릭하세요</span>
+              <span className="text-slate-500 text-sm mt-1">Click to choose a different file</span>
             </>
           ) : (
              <>
               <UploadCloudIcon className="w-10 h-10 text-slate-500 mb-3" />
-              <span className="text-slate-700 font-medium">이력서를 업로드하려면 클릭하세요.</span>
+              <span className="text-slate-700 font-medium">Click to upload your resume</span>
               <span className="text-slate-500 text-sm mt-1">.txt, .md, or .pdf</span>
             </>
           )}
@@ -105,9 +105,9 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
         <button
           onClick={handleStartClick}
           disabled={isStartDisabled}
-          className="w-full mt-8 bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-primary-dark focus:outline-none focus:ring-4 focus:ring-primary-focus/50 transition-all duration-300 text-sm shadow-lg shadow-primary-focus/20 disabled:bg-slate-400 disabled:cursor-not-allowed disabled:shadow-none"
+          className="w-full mt-8 bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-primary-dark focus:outline-none focus:ring-4 focus:ring-primary-focus/50 transition-all duration-300 text-sm shadow-lg shadow-primary-focus/20 disabled:bg-slate-400 disabled:cursor-not-allowed"
         >
-          면접 시작
+          Start Interview
         </button>
       </div>
     </div>
