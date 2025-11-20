@@ -12,15 +12,15 @@ interface InterviewReportViewProps {
 const RadarChart: React.FC<{ scores: { contentRelevance: number; structure: number; fluency: number; confidence: number } }> = ({ scores }) => {
     const size = 300;
     const center = size / 2;
-    const radius = 100;
+    const radius = 90; // Reduced radius to prevent label cutoff
     const maxScore = 10;
 
     // Dimensions
     const axes = [
-        { label: "내용 관련성", key: "contentRelevance", angle: 0 },      // Top
-        { label: "구조 (STAR)", key: "structure", angle: Math.PI / 2 },   // Right
-        { label: "유창성", key: "fluency", angle: Math.PI },              // Bottom
-        { label: "자신감", key: "confidence", angle: 3 * Math.PI / 2 },   // Left
+        { label: "내용 관련성", key: "contentRelevance", angle: 0, anchor: 'middle', baseline: 'auto' },      
+        { label: "구조 (STAR)", key: "structure", angle: Math.PI / 2, anchor: 'start', baseline: 'middle' },   
+        { label: "유창성", key: "fluency", angle: Math.PI, anchor: 'middle', baseline: 'hanging' },              
+        { label: "자신감", key: "confidence", angle: 3 * Math.PI / 2, anchor: 'end', baseline: 'middle' },   
     ];
 
     // Calculate coordinates for a point given a score and angle
@@ -57,15 +57,19 @@ const RadarChart: React.FC<{ scores: { contentRelevance: number; structure: numb
     // Labels
     const labels = axes.map((axis, index) => {
          // Push labels out a bit further than the radius
-        const { x, y } = getCoordinates(maxScore + 2.5, axis.angle);
+        const { x, y } = getCoordinates(maxScore + 1.5, axis.angle); // Reduced distance multiplier
+        
+        // Adjust Y for top label slightly
+        const finalY = index === 0 ? y - 5 : y;
+
         return (
             <text 
                 key={index} 
                 x={x} 
-                y={y} 
-                textAnchor="middle" 
-                dominantBaseline="middle" 
-                className="text-xs font-medium fill-slate-600"
+                y={finalY} 
+                textAnchor={axis.anchor} 
+                dominantBaseline={axis.baseline}
+                className="text-xs font-bold fill-slate-600"
             >
                 {axis.label}
             </text>
@@ -74,7 +78,7 @@ const RadarChart: React.FC<{ scores: { contentRelevance: number; structure: numb
 
     return (
         <div className="flex justify-center py-4">
-            <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+            <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="overflow-visible">
                 <g>
                     {gridPolygons}
                     {axisLines}

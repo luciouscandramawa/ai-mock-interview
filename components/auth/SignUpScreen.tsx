@@ -1,12 +1,11 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import AuthLayout from './AuthLayout';
 import Input from '../ui/Input';
-import Select from '../ui/Select';
 import Button from '../ui/Button';
 import { MailIcon, LockIcon, UserIcon, GraduationCapIcon, BrainIcon } from '../icons';
-import { getSchools, signUp } from '../../services/authService';
-import { School, User } from '../../types';
+import { signUp } from '../../services/authService';
+import { User } from '../../types';
 
 interface SignUpScreenProps {
   onSignUp: (user: User) => void;
@@ -20,18 +19,12 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onSwitchToSignIn 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   
-  // Organization State
-  const [schools, setSchools] = useState<School[]>([]);
-  const [selectedSchoolId, setSelectedSchoolId] = useState('');
-  const [selectedGrade, setSelectedGrade] = useState<number | ''>('');
-  const [selectedClassNumber, setSelectedClassNumber] = useState<number | ''>('');
+  // Simplified Organization State (Text Inputs)
+  const [schoolName, setSchoolName] = useState('');
+  const [grade, setGrade] = useState<number | ''>('');
+  const [major, setMajor] = useState('');
 
   const [isLoading, setIsLoading] = useState(false);
-
-  // Load schools on mount
-  useEffect(() => {
-    getSchools().then(setSchools);
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,16 +32,16 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onSwitchToSignIn 
         alert("비밀번호가 일치하지 않습니다.");
         return;
     }
-    if (!selectedSchoolId) {
-        alert("학교를 선택해주세요.");
+    if (!schoolName.trim()) {
+        alert("학교 이름을 입력해주세요.");
         return;
     }
-    if (!selectedGrade) {
-        alert("학년을 선택해주세요.");
+    if (!grade) {
+        alert("학년을 입력해주세요.");
         return;
     }
-    if (role === 'student' && !selectedClassNumber) {
-        alert("반을 입력해주세요.");
+    if (role === 'student' && !major.trim()) {
+        alert("전공을 입력해주세요.");
         return;
     }
 
@@ -58,9 +51,9 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onSwitchToSignIn 
             name, 
             email, 
             role, 
-            selectedSchoolId, 
-            Number(selectedGrade), 
-            role === 'student' ? Number(selectedClassNumber) : undefined
+            schoolName, 
+            Number(grade), 
+            major
         );
         onSignUp(user);
     } catch (error) {
@@ -74,7 +67,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onSwitchToSignIn 
   return (
     <AuthLayout 
       title="회원가입" 
-      subtitle="학교와 학년을 선택하여 맞춤형 서비스를 이용하세요."
+      subtitle="정보를 입력하여 맞춤형 서비스를 이용하세요."
     >
       <div className="flex p-1 bg-slate-100 rounded-xl mb-6">
         <button
@@ -107,38 +100,34 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onSwitchToSignIn 
         />
         
         <div className="space-y-4">
-             <Select
-                label="학교 선택"
-                options={schools.map(s => ({ value: s.id, label: s.name }))}
-                value={selectedSchoolId}
-                onChange={(e) => setSelectedSchoolId(e.target.value)}
+             <Input
+                label="학교명"
+                placeholder="예: 이리공업고등학교"
+                value={schoolName}
+                onChange={(e) => setSchoolName(e.target.value)}
                 required
             />
             
             <div className="grid grid-cols-2 gap-4">
-                <Select
-                    label="학년 선택"
-                    options={[
-                        { value: 1, label: '1학년' },
-                        { value: 2, label: '2학년' },
-                        { value: 3, label: '3학년' }
-                    ]}
-                    value={selectedGrade}
-                    onChange={(e) => setSelectedGrade(Number(e.target.value))}
+                <Input
+                    label="학년"
+                    type="number"
+                    placeholder="1"
+                    min="1"
+                    max="6"
+                    value={grade}
+                    onChange={(e) => setGrade(Number(e.target.value))}
                     required
                 />
-                {role === 'student' && (
-                     <Input
-                        label="반 입력"
-                        type="number"
-                        placeholder="예: 3"
-                        min="1"
-                        max="20"
-                        value={selectedClassNumber}
-                        onChange={(e) => setSelectedClassNumber(Number(e.target.value))}
-                        required
-                     />
-                )}
+                
+                <Input
+                    label="전공"
+                    type="text"
+                    placeholder={role === 'teacher' ? "담당 과목/전공" : "예: 소프트웨어과"}
+                    value={major}
+                    onChange={(e) => setMajor(e.target.value)}
+                    required={role === 'student'}
+                />
             </div>
         </div>
 

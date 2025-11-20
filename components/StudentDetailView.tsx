@@ -50,7 +50,7 @@ const StudentDetailView: React.FC<StudentDetailViewProps> = ({ studentId, onBack
       <div className="flex items-baseline justify-between mb-6">
         <div>
             <h1 className="text-3xl font-bold text-slate-800">{student.name}</h1>
-            <p className="text-lg text-primary font-medium">{student.major}</p>
+            <p className="text-lg text-primary font-medium">{student.grade}학년 • {student.major}</p>
         </div>
       </div>
 

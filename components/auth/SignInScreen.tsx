@@ -14,7 +14,8 @@ interface SignInScreenProps {
 
 const SignInScreen: React.FC<SignInScreenProps> = ({ onSignIn, onSwitchToSignUp }) => {
   const [email, setEmail] = useState('student@elice.io');
-  const [password, setPassword] = useState('');
+  // Pre-filled password for easy login
+  const [password, setPassword] = useState('password1234');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {

@@ -24,6 +24,7 @@ export interface DetailedFeedback {
 }
 
 export interface InterviewReport {
+  date?: string; // Added date for history
   scores: {
     contentRelevance: number; // 40%
     structure: number;        // 30%
@@ -46,24 +47,23 @@ export interface InterviewReport {
 export interface StudentSummary {
   id: string;
   name: string;
-  major: string; // Still useful for context, even if not used for filtering
-  schoolId: string;
-  grade: number;       // 1, 2, 3
-  classNumber: number; // 1, 2, 3...
+  major: string; 
+  schoolName: string; 
+  grade: number;       
   latestScore: number;
   improvement: number; // as a percentage
   completed: boolean;
 }
 
-// StudentDetail now holds the full report instead of a partial session list
+// StudentDetail now holds the history
 export interface StudentDetail {
     id: string;
     name: string;
     major: string;
-    schoolId: string;
+    schoolName: string;
     grade: number;
-    classNumber: number;
-    report?: InterviewReport;
+    report?: InterviewReport; // The latest report
+    history: InterviewReport[]; // List of past reports
 }
 
 export interface User {
@@ -71,11 +71,9 @@ export interface User {
     name: string;
     email: string;
     role: 'student' | 'teacher';
-    schoolId?: string;
-    schoolName?: string; 
-    grade?: number;       // Year (1, 2, 3)
-    classNumber?: number; // Class (1, 2, 3...) - Optional for teachers
-    className?: string;   // Generated string "1학년 2반"
+    schoolName: string; 
+    grade?: number;       
+    major?: string;       
     avatarUrl?: string;
 }
 

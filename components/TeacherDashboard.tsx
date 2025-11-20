@@ -19,9 +19,10 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ currentUser, onSele
       setIsLoading(true);
       const allStudents = await getTeacherDashboardData();
       
-      // Filter students based on teacher's school AND Grade
+      // Filter students based on teacher's school Name AND Grade
       const myStudents = allStudents.filter(s => {
-          if (s.schoolId !== currentUser.schoolId) return false;
+          // Simple string match for demo
+          if (s.schoolName !== currentUser.schoolName) return false;
           // If teacher has a grade assigned, filter by it
           if (currentUser.grade && s.grade !== currentUser.grade) return false;
           return true;
@@ -30,7 +31,7 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ currentUser, onSele
       setStudents(myStudents);
       setIsLoading(false);
     };
-    if (currentUser.schoolId) {
+    if (currentUser.schoolName) {
         fetchData();
     }
   }, [currentUser]);
@@ -69,8 +70,8 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ currentUser, onSele
                 <thead className="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-200">
                 <tr>
                     <th scope="col" className="px-6 py-4 font-bold">학생 이름</th>
-                    <th scope="col" className="px-6 py-4 font-bold">학년/반</th>
-                    <th scope="col" className="px-6 py-4 font-bold">전공 (참고)</th>
+                    <th scope="col" className="px-6 py-4 font-bold">학년</th>
+                    <th scope="col" className="px-6 py-4 font-bold">전공</th>
                     <th scope="col" className="px-6 py-4 font-bold">상태</th>
                     <th scope="col" className="px-6 py-4 font-bold text-center">최근 점수</th>
                     <th scope="col" className="px-6 py-4 font-bold text-center">성취도 변화</th>
@@ -87,9 +88,9 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ currentUser, onSele
                         {student.name}
                     </td>
                     <td className="px-6 py-4">
-                        {student.grade}학년 {student.classNumber}반
+                        {student.grade}학년
                     </td>
-                    <td className="px-6 py-4">{student.major}</td>
+                    <td className="px-6 py-4 font-medium text-slate-700">{student.major}</td>
                     <td className="px-6 py-4">
                         {student.completed ? (
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold text-green-800 bg-green-100">완료됨</span>

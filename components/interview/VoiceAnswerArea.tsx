@@ -77,7 +77,7 @@ const VoiceAnswerArea: React.FC<VoiceAnswerAreaProps> = ({
                                 : "답변을 입력하거나 왼쪽의 마이크 버튼을 눌러 말해보세요..."
                         }
                         className={`
-                            w-full h-full p-4 border rounded-xl resize-none text-slate-800 leading-relaxed
+                            w-full h-full p-4 pr-28 border rounded-xl resize-none text-slate-800 leading-relaxed
                             focus:outline-none focus:ring-2 transition-colors
                             ${isReadOnly 
                                 ? 'bg-slate-50 text-slate-600 border-slate-200 focus:ring-slate-200 cursor-not-allowed' 

@@ -175,24 +175,9 @@ const InterviewSession: React.FC<InterviewSessionProps> = ({ questions, onFinish
     setIsRecording(newIsRecording);
 
     if (newIsRecording) {
-      // Do not clear previous answer if it's a resume-based question and we are just pausing/resuming?
-      // Actually, standard behavior for a new take is often to clear, but let's append or just keep consistent.
-      // The previous logic cleared it: `setCurrentAnswer('');`. Let's stick to that for "new attempt".
-      // But if the user just paused, maybe they want to continue? 
-      // For simplicity and "retake" feel, let's clear interim but keep final?
-      // The implementation below clears everything on start.
       if (finalTranscriptRef.current === '' && currentAnswer === '') {
            // Initial start
-      } else {
-          // Restarting?
-          // For now, let's keep the existing logic of "Toggle = Start/Stop". 
-          // If I want to append, I shouldn't clear.
-          // If I want to overwrite, I clear.
-          // Let's assume the user might want to correct themselves, so we don't auto-clear unless they navigate.
-          // However, the `recognition.onresult` logic builds `fullTranscript` from `finalTranscriptRef`.
-          // If we don't clear `finalTranscriptRef`, it appends.
       }
-      
       recognitionRef.current.start();
     } else {
       recognitionRef.current.stop();
@@ -253,13 +238,12 @@ const InterviewSession: React.FC<InterviewSessionProps> = ({ questions, onFinish
                 isRecording={isRecording}
                 onToggleRecording={toggleRecording}
                 isSpeechSupported={isSpeechSupported}
-                isReadOnly={isResumeBased} // Enforce voice-only for resume based questions
+                isReadOnly={isResumeBased} 
             />
 
             <div className="mt-6 flex justify-end">
                 <Button
                     onClick={handleNext}
-                    disabled={!currentAnswer.trim()}
                     className="px-8"
                 >
                     {isLastQuestion ? '면접 종료 및 결과 확인' : '다음 질문'}

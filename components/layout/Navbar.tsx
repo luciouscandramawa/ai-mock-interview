@@ -62,7 +62,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onToggleRole }) => {
                     <div className="px-4 py-3 bg-slate-50">
                       <p className="text-sm text-slate-900 font-bold">{user.schoolName}</p>
                       <p className="text-xs text-slate-600 mt-0.5">
-                        {user.className ? user.className : (user.grade ? `${user.grade}학년` : '')}
+                        {user.grade ? `${user.grade}학년` : ''} {user.major ? `• ${user.major}` : ''}
                       </p>
                       <p className="text-xs text-slate-400 mt-1 truncate">{user.email}</p>
                     </div>

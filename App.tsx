@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import WelcomeScreen from './components/WelcomeScreen';
 import InterviewSession from './components/InterviewSession';
 import ResultsScreen from './components/ResultsScreen';
@@ -9,7 +9,7 @@ import SignInScreen from './components/auth/SignInScreen';
 import SignUpScreen from './components/auth/SignUpScreen';
 import Navbar from './components/layout/Navbar';
 import { InterviewReport, Question, Answer, User, AuthView } from './types';
-import { generateQuestions, evaluateAnswers, saveInterviewReportForStudent } from './services/geminiService';
+import { generateQuestions, evaluateAnswers, saveInterviewReportForStudent, getStudentDetails } from './services/geminiService';
 import { GraduationCapIcon } from './components/icons';
 
 type AppView = 'welcome' | 'session' | 'results' | 'teacherDashboard' | 'studentDetail';
@@ -44,9 +44,26 @@ const App: React.FC = () => {
   const [view, setView] = useState<AppView>('welcome');
   const [questions, setQuestions] = useState<Question[]>([]);
   const [report, setReport] = useState<InterviewReport | null>(null);
+  const [studentHistory, setStudentHistory] = useState<InterviewReport[]>([]);
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Load student history if user is a student
+  useEffect(() => {
+      const fetchHistory = async () => {
+          if (isAuthenticated && currentUser?.role === 'student') {
+              try {
+                  const details = await getStudentDetails(currentUser.id);
+                  setStudentHistory(details.history || []);
+              } catch (e) {
+                  console.log("Fetching history failed (likely new user)", e);
+                  setStudentHistory([]);
+              }
+          }
+      };
+      fetchHistory();
+  }, [isAuthenticated, currentUser]);
 
   const handleAuthSuccess = (user: User) => {
     setCurrentUser(user);
@@ -66,12 +83,12 @@ const App: React.FC = () => {
     setView('welcome');
     setQuestions([]);
     setReport(null);
+    setStudentHistory([]);
   };
 
   const handleRoleToggle = () => {
     if (!currentUser) return;
     // Demo feature: toggle role but keep user data for simplicity in this mock
-    // In real app, this wouldn't exist or would require re-login
     const newRole = currentUser.role === 'student' ? 'teacher' : 'student';
     setCurrentUser({ ...currentUser, role: newRole });
     
@@ -102,8 +119,12 @@ const App: React.FC = () => {
     setError(null);
     try {
       const interviewReport = await evaluateAnswers(questions, answers);
-      // For demo: save to the 'demo student' slot or the current user if we had a real backend
-      saveInterviewReportForStudent('3', interviewReport);
+      if (currentUser) {
+        saveInterviewReportForStudent(currentUser.id, interviewReport);
+        // Refresh history
+        const details = await getStudentDetails(currentUser.id);
+        setStudentHistory(details.history || []);
+      }
       setReport(interviewReport);
       setView('results');
     } catch (err)
@@ -113,7 +134,7 @@ const App: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [questions]);
+  }, [questions, currentUser]);
 
   const handleTryAnotherTopic = () => {
     setQuestions([]);
@@ -129,6 +150,11 @@ const App: React.FC = () => {
   const handleBackToDashboard = () => {
     setSelectedStudentId(null);
     setView('teacherDashboard');
+  };
+  
+  const handleViewHistoryReport = (historyReport: InterviewReport) => {
+      setReport(historyReport);
+      setView('results');
   };
 
   const renderMainContent = () => {
@@ -172,7 +198,13 @@ const App: React.FC = () => {
         return selectedStudentId && <StudentDetailView studentId={selectedStudentId} onBack={handleBackToDashboard} />;
       case 'welcome':
       default:
-        return <WelcomeScreen onStart={handleStartInterview} />;
+        return (
+            <WelcomeScreen 
+                onStart={handleStartInterview} 
+                history={studentHistory} 
+                onViewReport={handleViewHistoryReport}
+            />
+        );
     }
   };
 

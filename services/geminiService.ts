@@ -194,24 +194,25 @@ export const evaluateAnswers = async (questions: Question[], answers: Answer[]):
     const { contentRelevance, structure, fluency, confidence } = result.scores;
     const weightedScore = (contentRelevance * 0.4) + (structure * 0.3) + (fluency * 0.2) + (confidence * 0.1);
     result.totalScore = Number(weightedScore.toFixed(1));
+    result.date = new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
 
     return result;
 };
 
 
 // --- MOCK DATA ---
-// Updated with Iksan region schools and Grade/Class structure
 
 let mockStudentList: StudentSummary[] = [
-    { id: '1', name: '김민호', major: '자동화기계', latestScore: 42, improvement: 15, completed: true, schoolId: 'iksan-tech', grade: 3, classNumber: 1 },
-    { id: '2', name: '박지윤', major: '전기제어', latestScore: 85, improvement: 10, completed: true, schoolId: 'iksan-tech', grade: 3, classNumber: 2 },
-    { id: '3', name: '이서준', major: '스마트팩토리', latestScore: 65, improvement: -5, completed: false, schoolId: 'iksan-tech', grade: 3, classNumber: 2 },
-    { id: '4', name: '최혜원', major: '조리제빵', latestScore: 92, improvement: 20, completed: true, schoolId: 'iksan-tech', grade: 2, classNumber: 1 },
-    { id: '5', name: '정우성', major: '기계설계', latestScore: 80, improvement: 5, completed: true, schoolId: 'jeonbuk-mech', grade: 3, classNumber: 5 },
+    { id: '1', name: '김민호', major: '자동화기계', latestScore: 42, improvement: 15, completed: true, schoolName: '이리공업고등학교', grade: 3 },
+    { id: '2', name: '박지윤', major: '전기제어', latestScore: 85, improvement: 10, completed: true, schoolName: '이리공업고등학교', grade: 3 },
+    { id: '3', name: '이서준', major: '스마트팩토리', latestScore: 65, improvement: -5, completed: false, schoolName: '이리공업고등학교', grade: 3 },
+    { id: '4', name: '최혜원', major: '조리제빵', latestScore: 92, improvement: 20, completed: true, schoolName: '이리공업고등학교', grade: 2 },
+    { id: '5', name: '정우성', major: '기계설계', latestScore: 80, improvement: 5, completed: true, schoolName: '전북기계공업고등학교', grade: 3 },
 ];
 
 // Helper to generate a mock report (Generic)
-const createMockReport = (score: number, name: string): InterviewReport => ({
+const createMockReport = (score: number, name: string, date: string): InterviewReport => ({
+    date: date,
     scores: {
         contentRelevance: score > 80 ? 9 : 7,
         structure: score > 80 ? 8 : 6,
@@ -245,8 +246,8 @@ const createMockReport = (score: number, name: string): InterviewReport => ({
     ]
 });
 
-// Realistic Mixed Performance Report (Based on user screenshot)
 const detailedKimMinHoReport: InterviewReport = {
+    date: '2024년 3월 15일',
     scores: {
         contentRelevance: 4,
         structure: 3,
@@ -309,63 +310,93 @@ let mockStudentDetailData: { [key: string]: StudentDetail } = {
         id: '1',
         name: '김민호',
         major: '자동화기계',
-        schoolId: 'iksan-tech',
+        schoolName: '이리공업고등학교',
         grade: 3,
-        classNumber: 1,
-        report: detailedKimMinHoReport // Updated with realistic demo data
+        report: detailedKimMinHoReport,
+        history: [detailedKimMinHoReport, createMockReport(65, '김민호', '2024년 3월 10일')]
     },
     '2': {
         id: '2',
         name: '박지윤',
         major: '전기제어',
-        schoolId: 'iksan-tech',
+        schoolName: '이리공업고등학교',
         grade: 3,
-        classNumber: 2,
-        report: createMockReport(85, '박지윤')
+        report: createMockReport(85, '박지윤', '2024년 3월 14일'),
+        history: [createMockReport(85, '박지윤', '2024년 3월 14일')]
     },
     '3': {
         id: '3',
         name: '이서준',
         major: '스마트팩토리',
-        schoolId: 'iksan-tech',
+        schoolName: '이리공업고등학교',
         grade: 3,
-        classNumber: 2,
+        history: []
     },
     '4': {
         id: '4',
         name: '최혜원',
         major: '조리제빵',
-        schoolId: 'iksan-tech',
+        schoolName: '이리공업고등학교',
         grade: 2,
-        classNumber: 1,
-        report: createMockReport(92, '최혜원')
+        report: createMockReport(92, '최혜원', '2024년 3월 12일'),
+        history: [createMockReport(92, '최혜원', '2024년 3월 12일')]
     },
     '5': {
         id: '5',
         name: '정우성',
         major: '기계설계',
-        schoolId: 'jeonbuk-mech',
+        schoolName: '전북기계공업고등학교',
         grade: 3,
-        classNumber: 5,
-        report: createMockReport(80, '정우성')
+        report: createMockReport(80, '정우성', '2024년 3월 11일'),
+        history: [createMockReport(80, '정우성', '2024년 3월 11일')]
     }
 };
 
 export const saveInterviewReportForStudent = (studentId: string, report: InterviewReport) => {
-    const studentSummary = mockStudentList.find(s => s.id === studentId);
-    const studentDetail = mockStudentDetailData[studentId];
+    // For the demo, if the student doesn't exist in mock data (e.g. dynamic sign up), 
+    // we just skip saving to the static list or create a temp entry locally.
+    // In a real app, this would save to DB.
+    let studentSummary = mockStudentList.find(s => s.id === studentId);
+    let studentDetail = mockStudentDetailData[studentId];
 
-    if (studentSummary && studentDetail) {
-        const newOverallScore = report.totalScore * 10; // Convert 0-10 to 0-100
-        const oldScore = studentSummary.latestScore;
-        const improvement = oldScore > 0 ? Math.round(((newOverallScore - oldScore) / oldScore) * 100) : 0;
-        
-        studentSummary.latestScore = Math.round(newOverallScore);
-        studentSummary.improvement = isFinite(improvement) ? improvement : 0;
-        studentSummary.completed = true;
-
-        studentDetail.report = report;
+    if (!studentDetail) {
+        // Create transient detail for demo
+        studentDetail = {
+            id: studentId,
+            name: 'Demo Student',
+            major: '소프트웨어',
+            schoolName: 'Demo School',
+            grade: 3,
+            history: []
+        };
+        mockStudentDetailData[studentId] = studentDetail;
     }
+
+    if (!studentSummary) {
+         // Create transient summary for demo
+         studentSummary = {
+            id: studentId,
+            name: 'Demo Student',
+            major: '소프트웨어',
+            schoolName: 'Demo School',
+            grade: 3,
+            latestScore: 0,
+            improvement: 0,
+            completed: false
+         };
+         mockStudentList.push(studentSummary);
+    }
+
+    const newOverallScore = report.totalScore * 10; // Convert 0-10 to 0-100
+    const oldScore = studentSummary.latestScore;
+    const improvement = oldScore > 0 ? Math.round(((newOverallScore - oldScore) / oldScore) * 100) : 0;
+    
+    studentSummary.latestScore = Math.round(newOverallScore);
+    studentSummary.improvement = isFinite(improvement) ? improvement : 0;
+    studentSummary.completed = true;
+
+    studentDetail.report = report;
+    studentDetail.history.unshift(report); // Add to history
 };
 
 
@@ -375,10 +406,18 @@ export const getTeacherDashboardData = async (): Promise<StudentSummary[]> => {
 };
 
 export const getStudentDetails = async (studentId: string): Promise<StudentDetail> => {
-    await new Promise(res => setTimeout(res, 700));
+    await new Promise(res => setTimeout(res, 500));
     const studentData = mockStudentDetailData[studentId];
     if (!studentData) {
-        throw new Error("Student not found");
+        // Return a default empty student for demo if not found
+        return {
+            id: studentId,
+            name: '학생',
+            major: '전공',
+            schoolName: '학교',
+            grade: 1,
+            history: []
+        };
     }
     return JSON.parse(JSON.stringify(studentData));
 };
